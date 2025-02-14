@@ -1,0 +1,7 @@
+[
+  {
+    "interfaceId": "IF-MSG-001",
+    "interfaceName": "예시 메세지 송수신용 토픽",
+    "topicName": "sample_topic"
+  }
+]
