@@ -4,7 +4,8 @@ import com.teststrategy.multimodule.maven.sf.framework.application.ApplicationCo
 import com.teststrategy.multimodule.maven.sf.framework.resource.RetryableUrlResource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -26,21 +28,38 @@ public class PropertyUtil {
     private static String applicationName = "";
     private static List<String> profiles;
 
+
+    /**
+     * Environment에서 Active Profiles를 가져와 profiles 리스트를 초기화한다.
+     */
+    private static void initializeProfiles() {
+
+        Environment environment = ApplicationContextUtil.getApplicationContext().getEnvironment();
+
+        profiles = List.of(ArrayUtils.isEmpty(environment.getActiveProfiles()) ?
+                environment.getDefaultProfiles() : environment.getActiveProfiles());
+    }
+
+    public static String getLastActiveProfile() {
+        try {
+            if (CollectionUtils.isEmpty(profiles)) {
+                initializeProfiles();
+            }
+            return profiles.get(profiles.size() - 1);
+        } catch (Exception e) {
+            log.error("Failed to get last active profile", e);
+            return StringUtils.EMPTY;
+        }
+    }
+
+
     public static boolean hasAnyProfileByEndWith(String... args) {
         try {
             if (CollectionUtils.isEmpty(profiles)) {
-                Environment environment = ApplicationContextUtil.getApplicationContext().getEnvironment();
-                String[] localProfiles = environment.getActiveProfiles();
-
-                if (localProfiles.length == 0) {
-                    localProfiles = environment.getDefaultProfiles();
-                }
-
-                profiles = Arrays.asList(localProfiles);
+                initializeProfiles();
             }
 
-            if (CollectionUtils.isEmpty(profiles))
-                return false;
+            if (CollectionUtils.isEmpty(profiles)) return false;
 
             return profiles.stream()
                     .anyMatch(profile -> Arrays.stream(args).anyMatch(arg ->
