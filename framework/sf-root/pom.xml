@@ -15,12 +15,14 @@
     <modules>
         <module>sf-core</module>
         <module>sf-eventuate</module>
+        <module>sf-eventuate-sleuth</module>
         <module>sf-kafka</module>
     </modules>
 
     <properties>
         <sf-core.version>1.0.0-SNAPSHOT</sf-core.version>
         <sf-eventuate.version>1.0.0-SNAPSHOT</sf-eventuate.version>
+        <sf-eventuate-sleuth.version>1.0.0-SNAPSHOT</sf-eventuate-sleuth.version>
         <sf-kafka.version>1.0.0-SNAPSHOT</sf-kafka.version>
     </properties>
 

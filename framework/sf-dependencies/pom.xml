@@ -334,11 +334,11 @@
                 <artifactId>ojdbc6</artifactId>
                 <version>${com.oracle.ojdbc6.version}</version>
             </dependency>
-            <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>mysql</groupId>-->
+<!--                <artifactId>mysql-connector-java</artifactId>-->
+<!--                <version>${mysql.version}</version>-->
+<!--            </dependency>-->
 
             <!-- spring-cloud -->
             <dependency>

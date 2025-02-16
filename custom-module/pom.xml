@@ -12,6 +12,7 @@
 
     <modules>
         <module>kafka-inspector</module>
+        <module>cm-test-common</module>
     </modules>
 
     <properties>
