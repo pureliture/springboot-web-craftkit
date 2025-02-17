@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+com.teststrategy.multimodule.maven.config.AutoConfigurationImportFilterForSpringBootTest
