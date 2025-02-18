@@ -69,7 +69,7 @@ public class SubscriberInspectorImpl implements SubscribeInspector {
         // 새로운 맵을 생성 (NPE 방지)
         this.allowedSubscribeMessageMap = allowedSubscribeMessageList.stream()
                 .filter(Objects::nonNull)  // dto 자체가 null인 경우 제거
-                .filter(dto -> dto.getTopicName() != null && dto.getConsumerGroupName() != null)
+                .filter(dto -> !(dto.getTopicName() == null && dto.getConsumerGroupName() == null))
                 .collect(AllowedSubscribeMessageMap::new, (map, dto) -> map.put(dto.getConsumerGroupName(), dto.getTopicName(), dto),
                         AllowedSubscribeMessageMap::putAll);
     }
