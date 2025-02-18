@@ -2,6 +2,7 @@ package com.teststrategy.multimodule.maven.config.properties;
 
 
 import com.teststrategy.multimodule.maven.sf.framework.logging.LogMarkers;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +49,7 @@ public class TopicInspectorProperties {
      * spring.application.name 에서 시스템코드으로 등록하며, 만약 application.yml에서
      * 설정이 있다면 변경하지 않는다.
      */
-    public void setApplicationNameIfBlank(String applicationName) {
+    public void setApplicationName(String applicationName) {
         if (StringUtils.isBlank(this.applicationName)) {
             this.applicationName = applicationName;
         }
