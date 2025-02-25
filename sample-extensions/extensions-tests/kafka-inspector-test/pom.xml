@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.teststrategy.multimodule.maven</groupId>
-        <artifactId>sample-extensions</artifactId>
+        <artifactId>extensions-root</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../extensions-root/pom.xml</relativePath>
     </parent>
 
     <artifactId>kafka-inspector-test</artifactId>
@@ -18,10 +18,8 @@
         <dependency>
             <groupId>com.teststrategy.multimodule.maven</groupId>
             <artifactId>kafka-inspector</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-            <!--            <version>${kafka-inspector.version}</version>-->
-            <!--            <scope>system</scope>-->
-            <!--            <systemPath>../target/com.teststrategy.multimodule.maven.</systemPath>-->
+            <version>${kafka-inspector.version}</version>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>com.teststrategy.multimodule.maven</groupId>
@@ -61,10 +59,12 @@
             <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-stream-test-binder</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

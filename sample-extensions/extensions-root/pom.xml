@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.teststrategy.multimodule.maven</groupId>
+        <artifactId>sample-extensions</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>extensions-root</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>kafka-inspector</module>
+    </modules>
+
+    <properties>
+        <kafka-inspector.version>1.0.0-SNAPSHOT</kafka-inspector.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.teststrategy.multimodule.maven</groupId>
+                <artifactId>kafka-inspector</artifactId>
+                <version>${kafka-inspector.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

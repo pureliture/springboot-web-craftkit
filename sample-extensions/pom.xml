@@ -11,9 +11,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>se-test-common</module>
-        <module>kafka-inspector</module>
-        <module>kafka-inspector-test</module>
+        <module>extensions-root</module>
+        <module>extensions-tests</module>
     </modules>
 
     <properties>
@@ -72,4 +71,16 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <deployAtEnd>true</deployAtEnd> <!-- 모든 모듈 빌드 후 배포 -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
