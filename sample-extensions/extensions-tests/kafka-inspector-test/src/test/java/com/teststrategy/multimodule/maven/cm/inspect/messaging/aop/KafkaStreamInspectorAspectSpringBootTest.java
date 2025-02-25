@@ -6,6 +6,7 @@ import com.teststrategy.multimodule.maven.config.context.MockStaticTestExecution
 import com.teststrategy.multimodule.maven.config.SpringCloudStreamBindModifier;
 import com.teststrategy.multimodule.maven.config.SpringCloudStreamTestConfig;
 import com.teststrategy.multimodule.maven.config.TopicInspectorTestPresetConfig;
+import com.teststrategy.multimodule.maven.config.context.TestExecutionCondition;
 import com.teststrategy.multimodule.maven.config.properties.TopicInspectorProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.binder.Binding;
@@ -56,7 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * If this test is executed without the {@code test} profile, it will be automatically skipped.
  * </p>
  */
-@EnabledIfSystemProperty(named = "spring.profiles.active", matches = "test")
+@ExtendWith(TestExecutionCondition.class)
 @ActiveProfiles("test")
 @TestExecutionListeners(
         listeners = {MockStaticTestExecutionListener.class},
