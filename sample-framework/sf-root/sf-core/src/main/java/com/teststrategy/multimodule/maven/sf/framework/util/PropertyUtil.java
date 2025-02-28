@@ -113,4 +113,12 @@ public class PropertyUtil {
             }
         }
     }
+
+    public static String getApplicationName() {
+        if (org.apache.commons.lang.StringUtils.isNotBlank(applicationName))
+            return applicationName;
+
+        applicationName = System.getProperty("spring.application.name");
+        return org.apache.commons.lang.StringUtils.defaultIfBlank(applicationName, "undefined");
+    }
 }
