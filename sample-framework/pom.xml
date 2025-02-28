@@ -14,6 +14,7 @@
     <modules>
         <module>sf-dependencies</module>
         <module>sf-root</module>
+        <module>sf-tests</module>
     </modules>
 
     <properties>

@@ -17,6 +17,7 @@
         <module>sf-eventuate</module>
         <module>sf-eventuate-sleuth</module>
         <module>sf-kafka</module>
+        <module>sf-hystrix</module>
     </modules>
 
     <properties>
@@ -24,6 +25,7 @@
         <sf-eventuate.version>1.0.0-SNAPSHOT</sf-eventuate.version>
         <sf-eventuate-sleuth.version>1.0.0-SNAPSHOT</sf-eventuate-sleuth.version>
         <sf-kafka.version>1.0.0-SNAPSHOT</sf-kafka.version>
+        <sf-hystrix.version>1.0.0-SNAPSHOT</sf-hystrix.version>
     </properties>
 
     <build>
@@ -66,6 +68,11 @@
                 <groupId>com.teststrategy.multimodule.maven</groupId>
                 <artifactId>sf-kafka</artifactId>
                 <version>${sf-kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.teststrategy.multimodule.maven</groupId>
+                <artifactId>sf-hystrix</artifactId>
+                <version>${sf-hystrix.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

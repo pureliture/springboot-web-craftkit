@@ -85,10 +85,10 @@ public class MockStaticTestExecutionListener extends AbstractTestExecutionListen
 
         // Load topic-related resource URLs dynamically from the profile-specific YAML.
         String publishResourceUrl = getTargetUrlFromProperty(testYamlName,
-                "sample-project.sample-extensions.inspector.topic.publish.resource-url");
+                "sample-extensions.inspector.topic.publish.resource-url");
 
         String subscribeResourceUrl = getTargetUrlFromProperty(testYamlName,
-                "sample-project.sample-extensions.inspector.topic.subscribe.resource-url");
+                "sample-extensions.inspector.topic.subscribe.resource-url");
 
         // Register mock resources based on loaded URLs.
         registerMockResourceForTargetUrl(publishResourceUrl, loadMockDataFromFile(getMockResponseFilePath(publishResourceUrl)));

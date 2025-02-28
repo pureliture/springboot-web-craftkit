@@ -49,23 +49,13 @@ public class Claims {
     private static final Set<String> NOT_ALLOWED_PRIVATE_CLAIM_NAMES;
 
     /**
-     * Initialises the registered claim name set.
+     * Initialize the registered claim name set.
      */
     static {
-        Set<String> n = new HashSet<>();
+        Set<String> claimSet = Set.of(ISSUER_CLAIM, SUBJECT_CLAIM, AUDIENCE_CLAIM, EXPIRATION_TIME_CLAIM, NOT_BEFORE_CLAIM,
+                ISSUED_AT_CLAIM, JWT_ID_CLAIM, CLIENT_IP, AUTHENTICATED_IP, USER_ID);
 
-        n.add(ISSUER_CLAIM);
-        n.add(SUBJECT_CLAIM);
-        n.add(AUDIENCE_CLAIM);
-        n.add(EXPIRATION_TIME_CLAIM);
-        n.add(NOT_BEFORE_CLAIM);
-        n.add(ISSUED_AT_CLAIM);
-        n.add(JWT_ID_CLAIM);
-        n.add(CLIENT_IP);
-        n.add(AUTHENTICATED_IP);
-        n.add(USER_ID);
-
-        NOT_ALLOWED_PRIVATE_CLAIM_NAMES = Collections.unmodifiableSet(n);
+        NOT_ALLOWED_PRIVATE_CLAIM_NAMES = Collections.unmodifiableSet(claimSet);
     }
 
     /**
@@ -114,21 +104,18 @@ public class Claims {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static Claims parse(String token) {
-        Claims Claims = null;
 
         String[] parts = token.split("\\.");
         if (parts.length < 2)
-            return Claims;
+            return null;
 
         try {
-            //
-            ObjectMapper om = new ObjectMapper();
+            ObjectMapper objectMapper = new ObjectMapper();
             byte[] bytes = Base64.getDecoder().decode(urlSafeCharToStandardChar(parts[1]));
-            HashMap payload = om.readValue(bytes, HashMap.class);
+            HashMap payload = objectMapper.readValue(bytes, HashMap.class);
 
-            JwtType jwtType = JwtType.getTypeByJti((String) payload.get(JWT_ID_CLAIM));
-            Claims =
-                    new Claims(jwtType, (String) payload.get(USER_ID))
+            JwtType jwtType = JwtType.valueOfJti((String) payload.get(JWT_ID_CLAIM));
+            return new Claims(jwtType, (String) payload.get(USER_ID))
                             .addGroup(payload.get(AUDIENCE_CLAIM))
                             .setJti((String) payload.get(JWT_ID_CLAIM))
                             .setIssuer((String) payload.get(ISSUER_CLAIM))
@@ -141,11 +128,11 @@ public class Claims {
                             .setClientIp((String) payload.get(CLIENT_IP))
                             .setAuthenticatedIp((String) payload.get(AUTHENTICATED_IP))
                             .setPrivateClaims(payload);
+
         } catch (Exception e) {
             log.error("Claims.parse() exception : {}", e.getMessage());
+            return null;
         }
-
-        return Claims;
     }
 
     private static String urlSafeCharToStandardChar(String base64UrlSafeString) {

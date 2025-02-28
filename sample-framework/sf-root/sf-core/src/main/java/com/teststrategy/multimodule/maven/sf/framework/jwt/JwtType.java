@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalTime;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 public enum JwtType {
@@ -18,10 +21,19 @@ public enum JwtType {
     CUSTOM_TOKEN    ("X-WAF-C-TOKEN", "C"), /* coustom token : 아직 정해지지 않음 */
     UNDEFINED_TOKEN    ("X-WAF-UNDEFINED", "U");
 
+    private static final long DEFAULT_TOKEN_MAX_AGE = 31_536_000L; // 365일
+    private static final Map<Character, JwtType> TOKEN_MAP = new HashMap<>();
+
+    static {
+        for (JwtType type : values()) {
+            TOKEN_MAP.put(type.prefix.charAt(0), type);
+        }
+    }
+
     private String tokenName;
     private String prefix;
 
-    private JwtType(String tokenName, String prefix) {
+    JwtType(String tokenName, String prefix) {
         this.tokenName = tokenName;
         this.prefix = prefix;
     }
@@ -34,88 +46,46 @@ public enum JwtType {
         return prefix;
     }
 
-    public static JwtType getTypeByJti(String jti) {
-        if (StringUtils.isEmpty(jti))
+    public static JwtType valueOfJti(String jti) {
+        if (StringUtils.isEmpty(jti)) {
             return UNDEFINED_TOKEN;
-
-        switch (jti.charAt(0)) {
-            case 'A':
-                return ACCESS_TOKEN;
-            case 'R':
-                return REFRESH_TOKEN;
-            case 'T':
-                return TEMPORARY_TOKEN;
-            case 'B':
-                return BYPASS_TOKEN;
-            case 'C':
-                return CUSTOM_TOKEN;
-            default:
-                return UNDEFINED_TOKEN;
         }
+        return TOKEN_MAP.getOrDefault(jti.charAt(0), UNDEFINED_TOKEN);
     }
 
     public long getCookieMaxAge(JwtProperties jwtSetting) {
-        TokenProperties token = getTokenProperties(jwtSetting);
-        if (token == null)
-            return 0;
-
-        return token.getCookieMaxAge();
+        return getTokenProperties(jwtSetting)
+                .map(TokenProperties::getCookieMaxAge)
+                .orElse(0L);
     }
 
     public LocalTime getNewDayTime(JwtProperties jwtSetting) {
-        TokenProperties token = getTokenProperties(jwtSetting);
-        if (token == null)
-            return null;
-
-        return token.getNewDayTime();
+        return getTokenProperties(jwtSetting)
+                .map(TokenProperties::getNewDayTime)
+                .orElse(null);
     }
 
     public long getTokenMaxAge(JwtProperties jwtSetting) {
-        TokenProperties token = getTokenProperties(jwtSetting);
-        if (token == null)
-            return 31536000; // 365일
-
-        Long maxAge = token.getTokenMaxAge();
-        if (maxAge == null)
-            return 31536000; // 365일
-
-        return maxAge.longValue();
+        return getTokenProperties(jwtSetting)
+                .map(TokenProperties::getTokenMaxAge)
+                .orElse(DEFAULT_TOKEN_MAX_AGE);
     }
 
     public Long[] getAgeRange(JwtProperties jwtSetting) {
-        TokenProperties token = getTokenProperties(jwtSetting);
-        Long[] nullValues = {};
-        Long[] result = {0L, 0L};
+        return getTokenProperties(jwtSetting)
+                .map(TokenProperties::getTokenAgeRange)
+                .filter(values -> values.length > 0)
+                .map(values -> {
+                    Long min = Math.max(values[0], 0L);
+                    Long max = (values.length > 1) ? Math.max(values[1], 0L) : min;
+                    Long[] result = {min, max};
 
-        if (token == null)
-            return nullValues;
-
-        Long[] values = token.getTokenAgeRange();
-        if (values == null || values.length == 0)
-            return nullValues;
-
-        if (values.length == 1) {
-            result[0] = values[0];
-            result[1] = values[0];
-        } else {
-            result[0] = values[0];
-            result[1] = values[1];
-        }
-
-        if (values[0] < 0L) {
-            result[0] = 0L;
-        }
-
-        if (values.length == 1 || values[1] < 0L) {
-            result[1] = 0L;
-        }
-
-        if (values.length == 1 || !values[0].equals(result[0]) || !values[1].equals(result[1])) {
-            log.debug("{} token의 Range 가 보정되었습니다. {} -> {}", this.name(), values, result);
-            token.setTokenAgeRange(result);
-        }
-
-        return result;
+                    if (!values[0].equals(min) || (values.length > 1 && !values[1].equals(max))) {
+                        log.debug("{} token의 Range가 보정되었습니다. {} -> {}", this.name(), values, result);
+                    }
+                    return result;
+                })
+                .orElse(new Long[]{});
     }
 
     /**
@@ -129,18 +99,19 @@ public enum JwtType {
      */
     @SuppressWarnings("javadoc")
     public String getCookiePath(JwtProperties jwtSetting) {
-        TokenProperties token = getTokenProperties(jwtSetting);
-        if (token == null)
-            return "/";
-
-        return JwtSupporter.expendBffContextRootPath(token.getCookiePath());
+        return getTokenProperties(jwtSetting)
+                .map(TokenProperties::getCookiePath)
+                .map(JwtSupporter::expendBffContextRootPath)
+                .orElse("/");
     }
 
-    private TokenProperties getTokenProperties(JwtProperties jwtSetting) {
-        Map<JwtType, TokenProperties> tokens = jwtSetting.getTokens();
-        if (tokens == null)
-            return null;
+    private Optional<TokenProperties> getTokenProperties(JwtProperties jwtSetting) {
+        return Optional.ofNullable(jwtSetting.getTokens())
+                .map(tokens -> tokens.get(this));
+    }
 
-        return tokens.get(this);
+    @Override
+    public String toString() {
+        return String.format("JwtType{name='%s', prefix='%s'}", tokenName, prefix);
     }
 }

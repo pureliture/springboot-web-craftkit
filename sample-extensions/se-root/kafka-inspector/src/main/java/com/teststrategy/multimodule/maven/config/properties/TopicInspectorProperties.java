@@ -16,7 +16,7 @@ import java.util.Set;
 @ConfigurationProperties(prefix = TopicInspectorProperties.PREFIX)
 public class TopicInspectorProperties {
 
-    public static final String PREFIX = "sample-project.sample-extensions.inspector.topic";
+    public static final String PREFIX = "sample-extensions.inspector.topic";
     private static final Logger log = LoggerFactory.getLogger(TopicInspectorProperties.class);
 
     @Setter
