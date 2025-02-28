@@ -11,7 +11,7 @@ repositories {
 dependencyManagement {
     imports {
         mavenBom("com.teststrategy.multimodule.maven:sample-extensions:1.0.0-SNAPSHOT")
-        mavenBom("com.teststrategy.multimodule.maven:extensions-root:1.0.0-SNAPSHOT")
+        mavenBom("com.teststrategy.multimodule.maven:se-root:1.0.0-SNAPSHOT")
     }
 }
 

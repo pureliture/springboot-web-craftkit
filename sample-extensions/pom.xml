@@ -11,9 +11,9 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>extensions-root</module>
+        <module>se-root</module>
         <module>se-test-common</module>
-        <module>extensions-tests</module>
+        <module>se-tests</module>
     </modules>
 
     <properties>

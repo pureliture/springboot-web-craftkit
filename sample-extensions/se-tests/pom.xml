@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.teststrategy.multimodule.maven</groupId>
-    <artifactId>extensions-tests</artifactId>
+    <artifactId>se-tests</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
