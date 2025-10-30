@@ -175,3 +175,50 @@ URI uri3 = restTemplate.getUriTemplateHandler()
 Notes:
 - If a placeholder cannot be resolved (unknown domain or API), a clear `DomainUriMappingException` is thrown indicating which configuration to check.
 - For bulk requests (URIs containing ":bulkProcess"), if a service defines a `bsvUrl`, it will be used automatically.
+
+
+
+## Advanced business error handler (optional)
+This module can detect business-level errors embedded in 2xx JSON responses and raise a consistent exception instead of returning a "successful" response with an error payload.
+
+- When enabled, a lightweight `ClientHttpRequestInterceptor` parses JSON responses and checks a configured code field.
+- If the code is not in the allowed success list, a `BusinessErrorException` (extends `RestClientException`) is thrown. The exception carries the HTTP status, the parsed business code/message, and the raw body (truncated for safety).
+
+Properties (all optional; feature is disabled by default):
+- `sample-framework.rest.error-handler.enabled` (boolean; default `false`)
+- `sample-framework.rest.error-handler.json-path.code` (string; default `code`) — dot-path to code field
+- `sample-framework.rest.error-handler.json-path.message` (string; default `message`) — dot-path to message field
+- `sample-framework.rest.error-handler.success-codes` (set; default `OK,SUCCESS,0000,0`)
+- `sample-framework.rest.error-handler.inspect-content-types` (set; default includes `application/json`, `application/*+json`)
+- `sample-framework.rest.error-handler.only-on-2xx` (boolean; default `true`)
+- `sample-framework.rest.error-handler.empty-body-is-success` (boolean; default `true`)
+
+Example configuration:
+```yaml
+sample-framework:
+  rest:
+    error-handler:
+      enabled: true
+      json-path:
+        code: $.code        # simple dot path; `$` is optional
+        message: $.message
+      success-codes: OK,SUCCESS,0000,0
+```
+
+Example behavior:
+```java
+// Response body: {"code":"ERROR","message":"invalid argument"}
+// HTTP status: 200 OK
+
+try {
+  ResponseEntity<String> res = restTemplate.getForEntity("https://example.org", String.class);
+} catch (BusinessErrorException ex) {
+  // ex.getBusinessCode() == "ERROR"
+  // ex.getBusinessMessage() == "invalid argument"
+}
+```
+
+Notes:
+- JSON-only: non-JSON responses are ignored by the interceptor.
+- The interceptor buffers the response so the body remains readable by message converters when it is not an error.
+- The interceptor is attached automatically to the auto-configured `RestTemplate` when the feature is enabled.

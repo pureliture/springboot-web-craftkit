@@ -1,5 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.*;
@@ -24,7 +25,7 @@ import java.time.Duration;
  * - Adds optional interceptors (token/header-forwarding/correlation) based on properties
  */
 @AutoConfiguration
-@EnableConfigurationProperties({HttpClientProperties.class, OAuthClientProperties.class, ForwardHeadersProperties.class, CorrelationProperties.class, HmacAuthProperties.class})
+@EnableConfigurationProperties({HttpClientProperties.class, OAuthClientProperties.class, ForwardHeadersProperties.class, CorrelationProperties.class, HmacAuthProperties.class, ErrorHandlerProperties.class})
 public class RestAutoConfiguration {
 
     @Bean
@@ -70,6 +71,13 @@ public class RestAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    public BusinessErrorDetectingInterceptor businessErrorDetectingInterceptor(ErrorHandlerProperties errorHandlerProperties,
+                                                                               ObjectProvider<ObjectMapper> objectMapperProvider) {
+        return new BusinessErrorDetectingInterceptor(errorHandlerProperties, objectMapperProvider.getIfAvailable());
+    }
+
+    @Bean
     public RestTemplateCustomizer restTemplateCustomizer(TokenClientHttpRequestInterceptor tokenInterceptor,
                                                          OAuthClientProperties oAuthClientProperties,
                                                          ForwardHeadersClientHttpRequestInterceptor forwardHeadersInterceptor,
@@ -77,7 +85,9 @@ public class RestAutoConfiguration {
                                                          CorrelationIdClientHttpRequestInterceptor correlationInterceptor,
                                                          CorrelationProperties correlationProperties,
                                                          HmacClientHttpRequestInterceptor hmacInterceptor,
-                                                         HmacAuthProperties hmacAuthProperties) {
+                                                         HmacAuthProperties hmacAuthProperties,
+                                                         BusinessErrorDetectingInterceptor businessErrorDetectingInterceptor,
+                                                         ErrorHandlerProperties errorHandlerProperties) {
         return restTemplate -> {
             if (correlationProperties.isEnabled()) {
                 restTemplate.getInterceptors().add(correlationInterceptor);
@@ -90,6 +100,9 @@ public class RestAutoConfiguration {
             }
             if (hmacAuthProperties.isEnabled()) {
                 restTemplate.getInterceptors().add(hmacInterceptor);
+            }
+            if (errorHandlerProperties.isEnabled()) {
+                restTemplate.getInterceptors().add(businessErrorDetectingInterceptor);
             }
         };
     }
