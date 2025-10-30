@@ -1,0 +1,7 @@
+demo:
+  get:
+    url: /get?id={id}&name={name}
+
+apim:
+  resource:
+    url: "{@apim-pv}/resource?statusCode={statusCode}"

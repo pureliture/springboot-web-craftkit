@@ -102,3 +102,22 @@ Example:
 ```properties
 sample-framework.rest.domain.config=/etc/myapp/config
 ```
+
+## Domain API configuration (sf-core)
+To describe per-domain API paths and resolve `{@domain.api}` placeholders in URI templates, provide a YAML and set:
+- Property: `sample-framework.rest.domain.api.config` → path to `domain-api.yml`
+
+YAML example:
+```yaml
+# domain-api.yml
+example:
+  listUsers:
+    url: /users?page={page}
+api-gw:
+  resource:
+    url: "{@api-gw-pv}/resource?statusCode={statusCode}"
+```
+
+When configured, `sf-rest` auto-config exports beans:
+- `DomainProperties` (reads `domain.yml` services)
+- `DomainApiProperties` (reads `domain-api.yml` and resolves `{@domain.api}` in URIs)

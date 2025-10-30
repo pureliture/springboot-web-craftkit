@@ -1,0 +1,7 @@
+services:
+  demo:
+    url: http://localhost:8081
+  apim-pv:
+    url: http://localhost:8081/apim
+  apim-pb:
+    url: http://localhost:8082/apim
