@@ -9,7 +9,7 @@ Neutral Spring Boot auto-configuration for outbound REST clients.
 
 Planned/optional (parity roadmap):
 - HMAC header signature support.
-- Circuit breaker wrappers (Resilience4j / Hystrix adapter) around HTTP calls.
+- Circuit breaker wrappers (Resilience4j) around HTTP calls.
 - Error handling utilities and status mapping.
 
 ## Package
@@ -222,3 +222,37 @@ Notes:
 - JSON-only: non-JSON responses are ignored by the interceptor.
 - The interceptor buffers the response so the body remains readable by message converters when it is not an error.
 - The interceptor is attached automatically to the auto-configured `RestTemplate` when the feature is enabled.
+
+
+
+## HTTP client–based retry (HttpClient5)
+This module supports an opt-in retry mechanism implemented at the HTTP client layer using Apache HttpClient 5. It does not use Spring Retry, matching the requested wafful-style approach.
+
+- Disabled by default for backward compatibility.
+- Retries occur only for selected HTTP methods (idempotent by default) and for network I/O errors and/or configured HTTP statuses (5xx by default).
+- Backoff can be fixed or exponential, with an optional cap and `Retry-After` header support.
+
+Properties (all optional; prefix `sample-framework.rest.http-client.retry`):
+```yaml
+sample-framework:
+  rest:
+    http-client:
+      retry:
+        enabled: true                 # default: false
+        max-attempts: 3               # total attempts including the first
+        interval: 200ms               # base delay
+        backoff:
+          strategy: exponential       # fixed | exponential (default: exponential)
+          multiplier: 2.0             # for exponential
+        max-interval: 2s              # optional cap
+        retry-on-statuses: 500,502,503,504  # default: all 5xx when unspecified
+        retry-on-io-exceptions: true  # default: true
+        methods: GET,HEAD,OPTIONS     # idempotent by default
+        respect-retry-after: true     # honor Retry-After header if present
+        retry-sent-nonidempotent: false # keep false; unsafe to retry POST/PUT typically
+```
+
+Notes:
+- When enabled, `sf-rest` switches the `RestTemplate` request factory to an `HttpComponentsClientHttpRequestFactory` backed by a pooled `CloseableHttpClient` with the configured retry strategy.
+- Interceptor order remains unchanged; retries happen at the client layer. The advanced business error handler (if enabled) observes the final response after retries.
+- Use conservative defaults (idempotent methods only) unless you have strong guarantees about server behavior and request repeatability.
