@@ -121,3 +121,57 @@ api-gw:
 When configured, `sf-rest` auto-config exports beans:
 - `DomainProperties` (reads `domain.yml` services)
 - `DomainApiProperties` (reads `domain-api.yml` and resolves `{@domain.api}` in URIs)
+
+
+## Automatic URI placeholder resolution (parity with wafful-rest)
+When domain configuration is provided, `sf-rest` will automatically resolve URI placeholders in `RestTemplate` calls:
+- `{@domain}` → resolved using `domain.yml` from `sample-framework.rest.domain.config`
+- `{@domain.api}` → resolved using `domain-api.yml` from `sample-framework.rest.domain.api.config`
+- `${...}` → standard Spring Environment placeholders are resolved as well
+
+This resolution happens transparently via a `UriTemplateHandler` attached to the auto-configured `RestTemplate`.
+
+Prerequisites:
+- Provide a domain YAML and point to it:
+  ```properties
+  sample-framework.rest.domain.config=classpath:config/domain.yml
+  ```
+  Example YAML:
+  ```yaml
+  services:
+    demo:
+      url: http://localhost:8081
+    apim-pv:
+      url: http://localhost:8081/apim
+  ```
+- Optionally, provide a domain API mapping YAML for `{@domain.api}` shortcuts:
+  ```properties
+  sample-framework.rest.domain.api.config=classpath:config/domain-api.yml
+  ```
+  Example YAML:
+  ```yaml
+  apim:
+    resource:
+      url: "{@apim-pv}/resource?statusCode={statusCode}"
+  ```
+
+Usage examples:
+```java
+// 1) Using {@domain.api}
+URI uri = restTemplate.getUriTemplateHandler()
+    .expand("{@apim.resource}", Map.of("statusCode", "200"));
+// -> http://localhost:8081/apim/resource?statusCode=200
+
+// 2) Using {@domain} + path
+URI uri2 = restTemplate.getUriTemplateHandler()
+    .expand("{@demo}/users/{id}", Map.of("id", 10));
+// -> http://localhost:8081/users/10
+
+// 3) Environment placeholders are also resolved
+URI uri3 = restTemplate.getUriTemplateHandler()
+    .expand("http://example.org/ping?x=${test.value}");
+```
+
+Notes:
+- If a placeholder cannot be resolved (unknown domain or API), a clear `DomainUriMappingException` is thrown indicating which configuration to check.
+- For bulk requests (URIs containing ":bulkProcess"), if a service defines a `bsvUrl`, it will be used automatically.

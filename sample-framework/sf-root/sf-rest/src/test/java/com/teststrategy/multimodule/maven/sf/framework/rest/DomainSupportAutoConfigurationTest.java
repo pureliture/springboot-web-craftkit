@@ -6,6 +6,7 @@ import com.teststrategy.multimodule.maven.sf.framework.rest.config.DomainSupport
 import com.teststrategy.multimodule.maven.sf.framework.rest.config.RestAutoConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DomainSupportAutoConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(RestAutoConfiguration.class, DomainSupportAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(RestAutoConfiguration.class, DomainSupportAutoConfiguration.class, RestTemplateAutoConfiguration.class));
 
     @Test
     void domainBeansLoaded_whenPropertiesConfigured() {

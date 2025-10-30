@@ -1,13 +1,18 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.config;
 
+import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
+import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.*;
 import com.teststrategy.multimodule.maven.sf.framework.rest.setting.*;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -87,5 +92,19 @@ public class RestAutoConfiguration {
                 restTemplate.getInterceptors().add(hmacInterceptor);
             }
         };
+    }
+
+    @Bean
+    @ConditionalOnBean(DomainProperties.class)
+    public RestTemplateCustomizer domainUriTemplateHandlerCustomizer(DomainProperties domainProperties,
+                                                                     ObjectProvider<DomainApiProperties> domainApiProperties,
+                                                                     Environment environment) {
+        return restTemplate -> restTemplate.setUriTemplateHandler(
+                new com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainUriTemplateHandler(
+                        domainProperties,
+                        domainApiProperties.getIfAvailable(),
+                        environment
+                )
+        );
     }
 }
