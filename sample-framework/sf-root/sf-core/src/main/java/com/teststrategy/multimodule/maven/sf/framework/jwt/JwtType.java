@@ -2,11 +2,11 @@ package com.teststrategy.multimodule.maven.sf.framework.jwt;
 
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.JwtProperties;
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.JwtProperties.TokenProperties;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalTime;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +31,7 @@ public enum JwtType {
     }
 
     private String tokenName;
+    @Getter
     private String prefix;
 
     JwtType(String tokenName, String prefix) {
@@ -40,10 +41,6 @@ public enum JwtType {
 
     public String getName() {
         return tokenName;
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public static JwtType valueOfJti(String jti) {

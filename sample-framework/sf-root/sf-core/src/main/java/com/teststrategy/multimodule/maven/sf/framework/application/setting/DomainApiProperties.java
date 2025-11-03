@@ -41,6 +41,7 @@ public class DomainApiProperties implements InitializingBean {
     @ToString.Exclude
     private final transient Environment environment;
 
+    @Getter
     private final String configPath;
 
     /**
@@ -104,10 +105,6 @@ public class DomainApiProperties implements InitializingBean {
         return this.domainApis.values().stream()
                 .flatMap(innerMap -> innerMap.values().stream())
                 .toList();
-    }
-
-    public String getConfigPath() {
-        return this.configPath;
     }
 
     public String getUri(final String uriTemplateString) {
