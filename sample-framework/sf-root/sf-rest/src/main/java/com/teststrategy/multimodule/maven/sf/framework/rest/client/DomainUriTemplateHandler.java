@@ -65,6 +65,8 @@ public class DomainUriTemplateHandler implements UriTemplateHandler {
 
     private String prepareUriTemplate(String uriTemplateString) {
         final String original = uriTemplateString;
+        // Reset context to avoid leaking previous domain.api across calls
+        DomainApiContext.clear();
 
         // If there is no domain info configured at all, return as-is (no auto mapping).
         if (this.domains == null) {
@@ -72,8 +74,13 @@ public class DomainUriTemplateHandler implements UriTemplateHandler {
             return resolveEnvPlaceholders(uriTemplateString);
         }
 
-        // Step 1: resolve '{@domain.api}' from domain-api.yml, if present
+        // Step 1: capture '{@domain.api}' id for downstream (e.g., circuit breaker naming), then resolve via domain-api.yml
         if (this.domainApis != null) {
+            Matcher m = Pattern.compile("\\{@([\\\\w-]+\\\\.[\\\\w-]+)\\}").matcher(uriTemplateString);
+            if (m.find()) {
+                String id = m.group(1); // domain.api
+                DomainApiContext.setCurrentDomainApi(id);
+            }
             uriTemplateString = this.domainApis.getUri(uriTemplateString);
         }
 

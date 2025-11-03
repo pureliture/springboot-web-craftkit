@@ -256,3 +256,43 @@ Notes:
 - When enabled, `sf-rest` switches the `RestTemplate` request factory to an `HttpComponentsClientHttpRequestFactory` backed by a pooled `CloseableHttpClient` with the configured retry strategy.
 - Interceptor order remains unchanged; retries happen at the client layer. The advanced business error handler (if enabled) observes the final response after retries.
 - Use conservative defaults (idempotent methods only) unless you have strong guarantees about server behavior and request repeatability.
+
+## Circuit breaker (Resilience4j)
+Provides an opt-in Circuit Breaker around outbound HTTP calls using Resilience4j. Disabled by default.
+
+- Instance naming strategy:
+  - `domain-api` (default): if the URI template used `{@domain.api}`, that identifier (e.g., `apim.resource`) becomes the circuit breaker instance id.
+  - `uri`: fallback naming `METHOD host[:port]` (e.g., `GET example.org:8080`).
+- Ordering: Retry (HttpClient5) → Circuit Breaker → Business Error Handler.
+- Configuration is neutral and cooperates with standard `resilience4j.circuitbreaker.*` properties.
+
+Properties (prefix `sample-framework.rest.circuitbreaker`):
+```yaml
+sample-framework:
+  rest:
+    circuitbreaker:
+      enabled: true              # default: false
+      instance-from: domain-api  # domain-api | uri
+      default-config: default    # optional base config name in resilience4j registry
+      ignore-exceptions: com.teststrategy.multimodule.maven.sf.framework.rest.client.BusinessErrorException
+      # record-exceptions: java.io.IOException,org.springframework.web.client.ResourceAccessException
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 2
+        minimumNumberOfCalls: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+    # Instances can inherit the base config
+    instances:
+      apim.resource:
+        baseConfig: default
+```
+
+Notes:
+- If `default-config` is set but not found in the registry, the interceptor falls back to default CB config.
+- Exceptions listed in `ignore-exceptions` are treated as success from the CB’s perspective (not increasing failure rate).
+- You can still fully control per-instance behavior via `resilience4j.circuitbreaker.instances.<id>.*` keys.
