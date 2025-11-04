@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.cm.inspect.message.aop;
 
-import com.teststrategy.multimodule.maven.cm.inspect.message.exception.NotRegisterdSubscribeException;
+import com.teststrategy.multimodule.maven.cm.inspect.message.exception.NotRegisteredSubscribeException;
 import com.teststrategy.multimodule.maven.cm.inspect.message.service.SubscribeInspector;
 import com.teststrategy.multimodule.maven.sf.framework.util.MessageUtil;
 import io.eventuate.tram.messaging.common.ChannelMapping;
@@ -54,7 +54,7 @@ public class SubscribeInspectorAspect {
                     topic,
                     consumerGroup);
 
-            throw new NotRegisterdSubscribeException(message);
+            throw new NotRegisteredSubscribeException(message);
         }
     }
 }

@@ -9,7 +9,6 @@ import com.teststrategy.multimodule.maven.sf.framework.logging.LogMarkers;
 import com.teststrategy.multimodule.maven.sf.framework.util.PropertyUtil;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.RegExUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,7 +48,7 @@ public class AllowedTopicsReader implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        topicInspectorProperties.setApplicationNameIfBlank(environment.getProperty("spring.application.name"));
+        topicInspectorProperties.setApplicationName(environment.getProperty("spring.application.name"));
 
         if (topicInspectorProperties.isNotValidPublishListUrl()) {
             String message = "[Allowed Publish Topic List Verification] Invalid URL And Parameter (" + topicInspectorProperties.getParsedPublishListUrl() + ")";

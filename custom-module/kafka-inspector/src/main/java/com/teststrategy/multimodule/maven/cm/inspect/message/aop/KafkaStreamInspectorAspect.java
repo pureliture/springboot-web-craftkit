@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.cm.inspect.message.aop;
 
-import com.teststrategy.multimodule.maven.cm.inspect.message.exception.NotRegisterdSubscribeException;
+import com.teststrategy.multimodule.maven.cm.inspect.message.exception.NotRegisteredSubscribeException;
 import com.teststrategy.multimodule.maven.cm.inspect.message.exception.NotRegisteredPublishException;
 import com.teststrategy.multimodule.maven.cm.inspect.message.service.PublishInspector;
 import com.teststrategy.multimodule.maven.cm.inspect.message.service.SubscribeInspector;
@@ -50,7 +50,7 @@ public class KafkaStreamInspectorAspect {
     public void bindConsumer() {}
 
     @Before(value = "bindConsumer()")
-    public void beforeBindConsumer(JoinPoint joinPoint) throws Throwable {
+    public void beforeBindConsumer(JoinPoint joinPoint) {
 
         if (topicInspectorProperties.getSubscribe().isDisabled())
             return;
@@ -71,13 +71,14 @@ public class KafkaStreamInspectorAspect {
 
     private void throwExceptionIfNotAllowedSubscribe(String channel, String consumerGroup, String topic) {
 
-        String message = MessageUtil.getDefaultMessageIfNone(SUB_DEFAULT_MESSAGE,
-                SUB_MESSAGE_CODE,
-                topic,
-                consumerGroup);
-
         if (subscribeInspector.isNotAllowed(consumerGroup, topic)) {
-            throw new NotRegisterdSubscribeException(message);
+
+            String message = MessageUtil.getDefaultMessageIfNone(SUB_DEFAULT_MESSAGE,
+                    SUB_MESSAGE_CODE,
+                    topic,
+                    consumerGroup);
+
+            throw new NotRegisteredSubscribeException(message);
         }
     }
 
@@ -88,7 +89,7 @@ public class KafkaStreamInspectorAspect {
     public void bindProducer() {}
 
     @Before(value = "bindProducer()")
-    public void beforeBindProducer(JoinPoint joinPoint) throws Throwable {
+    public void beforeBindProducer(JoinPoint joinPoint) {
 
         if (topicInspectorProperties.getPublish().isDisabled())
             return;
