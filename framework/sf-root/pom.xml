@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.teststrategy.multimodule.maven</groupId>
+        <artifactId>sf-dependencies</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../sf-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sf-root</artifactId>
+    <name>sf-root</name>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>sf-core</module>
+        <module>sf-eventuate</module>
+        <module>sf-kafka</module>
+    </modules>
+
+    <properties>
+        <sf-core.version>1.0.0-SNAPSHOT</sf-core.version>
+        <sf-eventuate.version>1.0.0-SNAPSHOT</sf-eventuate.version>
+        <sf-kafka.version>1.0.0-SNAPSHOT</sf-kafka.version>
+    </properties>
+
+    <build>
+    <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/application*.yml</include>
+                    <include>**/application*.yaml</include>
+                    <include>**/application*.properties</include>
+                    <include>**/banner.txt</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <excludes>
+                    <exclude>**/application*.yml</exclude>
+                    <exclude>**/application*.yaml</exclude>
+                    <exclude>**/application*.properties</exclude>
+                    <exclude>**/banner.txt</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.teststrategy.multimodule.maven</groupId>
+                <artifactId>sf-core</artifactId>
+                <version>${sf-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.teststrategy.multimodule.maven</groupId>
+                <artifactId>sf-eventuate</artifactId>
+                <version>${sf-eventuate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.teststrategy.multimodule.maven</groupId>
+                <artifactId>sf-kafka</artifactId>
+                <version>${sf-kafka.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

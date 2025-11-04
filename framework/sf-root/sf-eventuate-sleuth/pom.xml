@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.teststrategy.multimodule.maven</groupId>
+        <artifactId>sf-dependencies</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../sf-dependencies/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sf-eventuate-sleuth</artifactId>
+    <name>sf-eventuate-sleuth</name>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <eventuateTramVersion>0.31.0.RELEASE</eventuateTramVersion>
+        <maven.build.configuration.skip>true</maven.build.configuration.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.eventuate.tram.core</groupId>
+            <artifactId>eventuate-tram-messaging</artifactId>
+            <version>${eventuateTramVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+    </dependencies>
+</project>
