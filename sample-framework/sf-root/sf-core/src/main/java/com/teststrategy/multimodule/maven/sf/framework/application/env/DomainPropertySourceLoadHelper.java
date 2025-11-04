@@ -16,18 +16,18 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Loads a domain.yml into Spring Environment if configured.
+ * 구성되어 있는 경우 Spring 환경에 domain.yml 파일을 로드합니다.
  *
- * The path is read from property key: {@code sample-framework.rest.domain.config}
- * - If the property points to a directory, this helper tries to load {@code domain.yml} from that directory.
- * - If the property points directly to a YAML file, that file is loaded.
- * - If the property is not set or the resource doesn't exist, this helper does nothing.
+ * 경로는 속성 키 {@code sf-rest.domain.config}에서 읽습니다.
+ * - 속성이 디렉토리를 가리키는 경우, 해당 디렉토리에서 {@code domain.yml}를 로드하려고 시도합니다.
+ * - 속성이 YAML 파일 경로를 직접 가리키는 경우, 그 파일을 로드합니다.
+ * - 속성이 설정되지 않았거나 리소스가 존재하지 않으면 이 헬퍼는 아무 작업도 수행하지 않습니다.
  */
 public class DomainPropertySourceLoadHelper {
 
     private static final Logger log = LoggerFactory.getLogger(DomainPropertySourceLoadHelper.class);
 
-    public static final String PROPERTY_KEY = "sample-framework.rest.domain.config";
+    public static final String PROPERTY_KEY = "sf-rest.domain.config";
 
     private final ConfigurableEnvironment environment;
     private final ResourceLoader resourceLoader;
@@ -41,14 +41,14 @@ public class DomainPropertySourceLoadHelper {
         String path = environment.getProperty(PROPERTY_KEY);
         if (path == null || path.isBlank()) {
             if (log.isDebugEnabled()) {
-                log.debug("{} not set. Skipping domain.yml load.", PROPERTY_KEY);
+                log.debug("{}가 설정되지 않았습니다. domain.yml 로드 건너뛰기.", PROPERTY_KEY);
             }
             return;
         }
 
         Resource resource = resolveResource(path);
         if (!resource.exists()) {
-            // If path is a dir, try domain.yml inside it
+            // 경로가 디렉토리인 경우, 그 안의 domain.yml을 시도합니다.
             File f = new File(path);
             if (f.isDirectory()) {
                 File candidate = new File(f, "domain.yml");
@@ -57,7 +57,7 @@ public class DomainPropertySourceLoadHelper {
         }
 
         if (!resource.exists()) {
-            log.warn("domain.yml resource not found for path: {}", path);
+            log.warn("path: {}에 대한 domain.yml 리소스를 찾을 수 없습니다.", path);
             return;
         }
 
@@ -66,34 +66,35 @@ public class DomainPropertySourceLoadHelper {
             List<PropertySource<?>> propertySources = loader.load("domain", resource);
             MutablePropertySources envSources = environment.getPropertySources();
             for (PropertySource<?> ps : propertySources) {
-                // avoid duplicate property source names
+                // 중복된 PropertySource 이름을 피합니다.
                 if (envSources.contains(ps.getName())) {
                     if (log.isDebugEnabled()) {
-                        log.debug("PropertySource '{}' already exists. Skipping.", ps.getName());
+                        log.debug("PropertySource '{}'가 이미 존재합니다. 건너뜁니다.", ps.getName());
                     }
                     continue;
                 }
-                // add last to avoid overriding existing application properties unless explicitly desired
+                // 기존 애플리케이션 속성 값을 망가뜨리지 않도록 마지막에 추가합니다.
                 envSources.addLast(ps);
                 if (log.isInfoEnabled()) {
-                    log.info("Loaded domain properties from {} as PropertySource '{}'.", resource, ps.getName());
+                    log.info("도메인 속성을 {}에서 PropertySource '{}'로 로드했습니다.", resource, ps.getName());
                 }
             }
         } catch (IOException e) {
-            log.warn("Failed to load domain.yml from {}", resource, e);
+            log.warn("{}", resource, e);
+            log.warn("domain.yml를 {}에서 로드하는 데 실패했습니다.", resource);
         }
     }
 
     private Resource resolveResource(String path) {
         try {
-            // First try as file system path
+            // 먼저 파일 시스템 경로로 시도
             File file = new File(path);
             if (file.exists()) {
                 return new FileSystemResource(file);
             }
         } catch (Exception ignored) {}
 
-        // Try via ResourceLoader (may support classpath: or other prefixes)
+        // ResourceLoader를 통해 시도(예: classpath: 등 지원될 수 있음)
         try {
             Resource res = resourceLoader.getResource(path);
             if (res != null && res.exists()) {
@@ -101,7 +102,7 @@ public class DomainPropertySourceLoadHelper {
             }
         } catch (Exception ignored) {}
 
-        // Fallback: classpath relative
+        // 기본: 클래스패스 상대 경로
         return new ClassPathResource(path);
     }
 }

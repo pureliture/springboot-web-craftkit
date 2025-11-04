@@ -9,18 +9,18 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Loads domain.yml (if configured) into the Spring Environment early in application startup.
+ * 애플리케이션 시작 시점에 조기에 Spring 환경에 domain.yml을(구성되어 있는 경우) 로드합니다.
  *
- * Property key: sample-framework.rest.domain.config
- * - If it's a directory, a file named domain.yml will be attempted within that directory.
- * - If it's a file path or a resource path, it will be resolved accordingly.
+ * 속성 키: sf-rest.domain.config
+ * - 값이 디렉토리인 경우, 해당 디렉토리 내에 domain.yml 파일을 시도합니다.
+ * - 값이 파일 경로나 리소스 경로인 경우, 이에 따라 해석합니다.
  */
 public class SampleFrameworkRestEnvironmentApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
     private static final Logger log = LoggerFactory.getLogger(SampleFrameworkRestEnvironmentApplicationContextInitializer.class);
 
     /**
-     * Execute with high precedence, after Spring Cloud bootstrap config but before most user configs.
+     * 높은 우선순위로 실행되며, Spring Cloud 부트스트랩 구성이 로드된 이후이면서 대부분의 사용자 구성보다 먼저 실행됩니다.
      */
     private int order = Ordered.HIGHEST_PRECEDENCE + 11;
 

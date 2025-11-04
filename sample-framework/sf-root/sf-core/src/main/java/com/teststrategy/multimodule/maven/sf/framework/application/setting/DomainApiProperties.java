@@ -35,7 +35,7 @@ public class DomainApiProperties implements InitializingBean {
 
     public static final String BULK_REQUEST_METHOD = ":bulkProcess";
 
-    public static final String CONFIG_PATH = "sample-framework.rest.domain.api.config";
+    public static final String CONFIG_PATH = "sf-rest.domain.api.config";
     public static final String PLACEHOLDERS = "${" + CONFIG_PATH + ":}";
 
     @ToString.Exclude

@@ -36,12 +36,12 @@ public class DomainProperties {
     /**
      * Property key to locate a YAML file or directory containing domain.yml
      */
-    public static final String CONFIG_PATH = "sample-framework.rest.domain.config";
+    public static final String CONFIG_PATH = "sf-rest.domain.config";
 
     /**
      * Optional prefix only for documentation/backward hints.
      */
-    public static final String PREFIX = "sample-framework.rest.domain";
+    public static final String PREFIX = "sf-rest.domain";
 
     /**
      * Services root key inside YAML.
