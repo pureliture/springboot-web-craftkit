@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 /**
  * Properties to enable and tune advanced business error detection on 2xx responses.
  *
- * Prefix: sample-framework.rest.error-handler
+ * Prefix: sf-rest.error-handler
  */
 @ConfigurationProperties(prefix = ErrorHandlerProperties.PREFIX)
 public class ErrorHandlerProperties {
 
-    public static final String PREFIX = "sample-framework.rest.error-handler";
+    public static final String PREFIX = "sf-rest.error-handler";
 
     /** Enable advanced 2xx JSON body inspection. */
     private boolean enabled = false;

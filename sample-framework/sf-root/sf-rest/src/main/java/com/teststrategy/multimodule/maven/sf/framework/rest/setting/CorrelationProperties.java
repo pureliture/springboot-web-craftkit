@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = CorrelationProperties.PREFIX)
 public class CorrelationProperties {
-    public static final String PREFIX = "sample-framework.rest.correlation";
+    public static final String PREFIX = "sf-rest.correlation";
 
     /** Ensure a correlation/transaction header is present on outbound requests. */
     private boolean enabled = true;

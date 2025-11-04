@@ -50,6 +50,18 @@
             <artifactId>resilience4j-circuitbreaker</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-timelimiter</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Cloud CircuitBreaker Resilience4j (for AOP factory path) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!-- Test -->
         <dependency>

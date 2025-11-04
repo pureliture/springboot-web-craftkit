@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = HmacAuthProperties.PREFIX)
 public class HmacAuthProperties {
-    public static final String PREFIX = "sample-framework.rest.hmac";
+    public static final String PREFIX = "sf-rest.hmac";
 
     /** Enable adding an HMAC signature header to outbound requests. */
     private boolean enabled = false;

@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = OAuthClientProperties.PREFIX)
 public class OAuthClientProperties {
-    public static final String PREFIX = "sample-framework.rest.oauth";
+    public static final String PREFIX = "sf-rest.oauth";
 
     /** Enable adding OAuth token to outbound requests. */
     private boolean enabled = false;

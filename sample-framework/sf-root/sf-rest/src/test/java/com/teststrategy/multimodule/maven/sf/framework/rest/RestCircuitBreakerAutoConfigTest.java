@@ -21,7 +21,8 @@ public class RestCircuitBreakerAutoConfigTest {
     void circuitBreakerInterceptor_wired_whenEnabled() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.circuitbreaker.enabled=true"
+                        "sf-rest.circuitbreaker.enabled=true",
+                        "sf-rest.circuitbreaker.mode=INTERCEPTOR"
                 )
                 .run(context -> {
                     RestTemplate rt = context.getBean(RestTemplate.class);
@@ -33,8 +34,9 @@ public class RestCircuitBreakerAutoConfigTest {
     void interceptor_order_before_businessErrorHandler_whenBothEnabled() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.circuitbreaker.enabled=true",
-                        "sample-framework.rest.error-handler.enabled=true"
+                        "sf-rest.circuitbreaker.enabled=true",
+                        "sf-rest.circuitbreaker.mode=INTERCEPTOR",
+                        "sf-rest.error-handler.enabled=true"
                 )
                 .run(context -> {
                     RestTemplate rt = context.getBean(RestTemplate.class);

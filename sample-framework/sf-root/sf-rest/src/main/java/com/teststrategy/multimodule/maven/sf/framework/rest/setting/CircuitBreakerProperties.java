@@ -10,15 +10,18 @@ import java.util.stream.Collectors;
 /**
  * Properties to enable and tune Resilience4j CircuitBreaker integration for RestTemplate.
  *
- * Prefix: sample-framework.rest.circuitbreaker
+ * Prefix: sf-rest.circuitbreaker
  */
 @ConfigurationProperties(prefix = CircuitBreakerProperties.PREFIX)
 public class CircuitBreakerProperties {
 
-    public static final String PREFIX = "sample-framework.rest.circuitbreaker";
+    public static final String PREFIX = "sf-rest.circuitbreaker";
 
     /** Enable CircuitBreaker feature. */
     private boolean enabled = false;
+
+    /** Select implementation mode: INTERCEPTOR or AOP (default). */
+    private Mode mode = Mode.AOP;
 
     /** Instance naming strategy. */
     private InstanceFrom instanceFrom = InstanceFrom.DOMAIN_API;
@@ -35,9 +38,13 @@ public class CircuitBreakerProperties {
     private Set<String> recordExceptions = new LinkedHashSet<>();
 
     public enum InstanceFrom { DOMAIN_API, URI }
+    public enum Mode { INTERCEPTOR, AOP }
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public Mode getMode() { return mode; }
+    public void setMode(Mode mode) { this.mode = mode; }
 
     public InstanceFrom getInstanceFrom() { return instanceFrom; }
     public void setInstanceFrom(InstanceFrom instanceFrom) { this.instanceFrom = instanceFrom; }

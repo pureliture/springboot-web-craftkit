@@ -2,6 +2,7 @@ package com.teststrategy.multimodule.maven.sf.framework.rest.client;
 
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorChain;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
@@ -18,9 +19,9 @@ import java.util.regex.Pattern;
 /**
  * UriTemplateHandler that resolves '{@domain.api}' and '{@domain}' placeholders automatically
  * using {@link DomainApiProperties} and {@link DomainProperties} before delegating to the
- * default Spring expansion logic.
+ * next handler in the chain (default Spring expansion by default).
  */
-public class DomainUriTemplateHandler implements UriTemplateHandler {
+public class DomainUriTemplateHandler extends UriTemplateHandlerInterceptorChain {
 
     private static final Pattern DOMAIN_MATCH_PATTERN = Pattern.compile("(?<=^\\{@)[a-zA-Z0-9-_]+(?=\\})");
 
@@ -30,8 +31,6 @@ public class DomainUriTemplateHandler implements UriTemplateHandler {
     private final DomainApiProperties domainApis;
     @Nullable
     private final Environment environment;
-
-    private final UriTemplateHandler delegate;
 
     public DomainUriTemplateHandler(@Nullable DomainProperties domains,
                                     @Nullable DomainApiProperties domainApis,
@@ -46,21 +45,21 @@ public class DomainUriTemplateHandler implements UriTemplateHandler {
         this.domains = domains;
         this.domainApis = domainApis;
         this.environment = environment;
-        this.delegate = delegate;
+        this.next = delegate;
     }
 
     @NonNull
     @Override
     public URI expand(@NonNull String uriTemplate, @NonNull Map<String, ?> uriVariables) {
         String prepared = prepareUriTemplate(uriTemplate);
-        return delegate.expand(prepared, uriVariables);
+        return next.expand(prepared, uriVariables);
     }
 
     @NonNull
     @Override
     public URI expand(@NonNull String uriTemplate, @NonNull Object... uriVariables) {
         String prepared = prepareUriTemplate(uriTemplate);
-        return delegate.expand(prepared, uriVariables);
+        return next.expand(prepared, uriVariables);
     }
 
     private String prepareUriTemplate(String uriTemplateString) {
@@ -103,9 +102,9 @@ public class DomainUriTemplateHandler implements UriTemplateHandler {
 
         // If unresolved '{@' remains, throw explicit error to guide configuration
         if (uriTemplateString.contains("{@")) {
-            String domainsPath = Optional.ofNullable(this.domains.getConfigPath()).orElse("sample-framework.rest.domain.config not set");
+            String domainsPath = Optional.ofNullable(this.domains.getConfigPath()).orElse("sf-rest.domain.config not set");
             String apisPath = Optional.ofNullable(this.domainApis).map(DomainApiProperties::getConfigPath)
-                    .orElse("sample-framework.rest.domain.api.config not set");
+                    .orElse("sf-rest.domain.api.config not set");
             throw new DomainUriMappingException(
                     "URI mapping failed. Check domain config (" + domainsPath + ") and API config (" + apisPath + ") for input URL: " + original);
         }

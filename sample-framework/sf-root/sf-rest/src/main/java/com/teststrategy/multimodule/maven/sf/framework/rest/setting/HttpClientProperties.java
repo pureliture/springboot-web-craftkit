@@ -6,7 +6,7 @@ import java.time.Duration;
 
 @ConfigurationProperties(prefix = HttpClientProperties.PREFIX)
 public class HttpClientProperties {
-    public static final String PREFIX = "sample-framework.rest.http-client";
+    public static final String PREFIX = "sf-rest.http-client";
 
     /**
      * Connection timeout for outbound REST calls.

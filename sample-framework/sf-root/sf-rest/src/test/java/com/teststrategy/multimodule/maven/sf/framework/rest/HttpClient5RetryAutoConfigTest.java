@@ -21,9 +21,9 @@ public class HttpClient5RetryAutoConfigTest {
     void httpClient5Retry_enabled_switchesRequestFactory() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.http-client.retry.enabled=true",
-                        "sample-framework.rest.http-client.connect-timeout=1s",
-                        "sample-framework.rest.http-client.read-timeout=2s"
+                        "sf-rest.http-client.retry.enabled=true",
+                        "sf-rest.http-client.connect-timeout=1s",
+                        "sf-rest.http-client.read-timeout=2s"
                 )
                 .run(context -> {
                     assertThat(context).hasSingleBean(RestTemplate.class);

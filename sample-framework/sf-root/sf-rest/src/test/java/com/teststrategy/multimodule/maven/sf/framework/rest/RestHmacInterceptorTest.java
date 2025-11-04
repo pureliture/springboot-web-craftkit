@@ -19,9 +19,9 @@ class RestHmacInterceptorTest {
     void hmacInterceptorAdded_whenHmacEnabled() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.hmac.enabled=true",
-                        "sample-framework.rest.hmac.key-id=test-key",
-                        "sample-framework.rest.hmac.secret=test-secret"
+                        "sf-rest.hmac.enabled=true",
+                        "sf-rest.hmac.key-id=test-key",
+                        "sf-rest.hmac.secret=test-secret"
                 )
                 .run(context -> {
                     RestTemplate rt = context.getBean(RestTemplate.class);

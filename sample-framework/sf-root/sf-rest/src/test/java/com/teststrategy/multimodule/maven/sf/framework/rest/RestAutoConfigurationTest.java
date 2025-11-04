@@ -19,8 +19,8 @@ public class RestAutoConfigurationTest {
     void restTemplateBeanCreated_withTimeouts() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.http-client.connect-timeout=2s",
-                        "sample-framework.rest.http-client.read-timeout=3s"
+                        "sf-rest.http-client.connect-timeout=2s",
+                        "sf-rest.http-client.read-timeout=3s"
                 )
                 .run(context -> {
                     assertThat(context).hasSingleBean(RestTemplate.class);
@@ -33,8 +33,8 @@ public class RestAutoConfigurationTest {
     void tokenInterceptorAdded_whenOAuthEnabled() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.oauth.enabled=true",
-                        "sample-framework.rest.oauth.static-token=dummy-token"
+                        "sf-rest.oauth.enabled=true",
+                        "sf-rest.oauth.static-token=dummy-token"
                 )
                 .run(context -> {
                     RestTemplate rt = context.getBean(RestTemplate.class);

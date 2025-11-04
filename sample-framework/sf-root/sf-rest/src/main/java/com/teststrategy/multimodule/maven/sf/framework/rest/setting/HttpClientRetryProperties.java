@@ -9,11 +9,11 @@ import java.util.Set;
 /**
  * Properties controlling Apache HttpClient5 based retry behavior for RestTemplate.
  *
- * Prefix: sample-framework.rest.http-client.retry
+ * Prefix: sf-rest.http-client.retry
  */
 @ConfigurationProperties(prefix = HttpClientRetryProperties.PREFIX)
 public class HttpClientRetryProperties {
-    public static final String PREFIX = "sample-framework.rest.http-client.retry";
+    public static final String PREFIX = "sf-rest.http-client.retry";
 
     /** Enable HttpClient5-based retry. */
     private boolean enabled = false;

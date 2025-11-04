@@ -20,8 +20,8 @@ public class DomainSupportAutoConfigurationTest {
     void domainBeansLoaded_whenPropertiesConfigured() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.domain.config=classpath:config/domain.yml",
-                        "sample-framework.rest.domain.api.config=classpath:config/domain-api.yml"
+                        "sf-rest.domain.config=classpath:config/domain.yml",
+                        "sf-rest.domain.api.config=classpath:config/domain-api.yml"
                 )
                 .run(context -> {
                     assertThat(context).hasSingleBean(DomainProperties.class);

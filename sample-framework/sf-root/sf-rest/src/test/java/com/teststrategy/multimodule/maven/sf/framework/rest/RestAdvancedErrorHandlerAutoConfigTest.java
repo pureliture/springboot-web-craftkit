@@ -19,7 +19,7 @@ public class RestAdvancedErrorHandlerAutoConfigTest {
     void businessErrorInterceptor_isWired_whenEnabled() {
         contextRunner
                 .withPropertyValues(
-                        "sample-framework.rest.error-handler.enabled=true"
+                        "sf-rest.error-handler.enabled=true"
                 )
                 .run(context -> {
                     RestTemplate rt = context.getBean(RestTemplate.class);

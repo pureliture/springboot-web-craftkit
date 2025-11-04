@@ -45,6 +45,7 @@ public class RestCircuitBreakerAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "mode", havingValue = "INTERCEPTOR", matchIfMissing = false)
     public RestTemplateCustomizer circuitBreakerRestTemplateCustomizer(CircuitBreakerInterceptor interceptor,
                                                                        ObjectProvider<BusinessErrorDetectingInterceptor> businessInterceptorProvider) {
         return restTemplate -> {

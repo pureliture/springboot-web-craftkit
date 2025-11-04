@@ -31,8 +31,8 @@ This module depends on `sf-core` for general framework base.
 - `RestAutoConfiguration`
 
 ## Configuration Properties
-- `sample-framework.rest.http-client.connect-timeout` (Duration, default `5s`)
-- `sample-framework.rest.http-client.read-timeout` (Duration, default `30s`)
+- `sf-rest.http-client.connect-timeout` (Duration, default `5s`)
+- `sf-rest.http-client.read-timeout` (Duration, default `30s`)
 - `sample-framework.rest.http-client.max-conn-total` (int, default `200`)
 - `sample-framework.rest.http-client.max-conn-per-route` (int, default `50`)
 - `sample-framework.rest.oauth.enabled` (boolean, default `false`)

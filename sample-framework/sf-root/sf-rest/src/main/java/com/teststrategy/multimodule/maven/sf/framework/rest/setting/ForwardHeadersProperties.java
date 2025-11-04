@@ -8,7 +8,7 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = ForwardHeadersProperties.PREFIX)
 public class ForwardHeadersProperties {
-    public static final String PREFIX = "sample-framework.rest.forward-headers";
+    public static final String PREFIX = "sf-rest.forward-headers";
 
     /** Enable forwarding some inbound headers to outbound requests. */
     private boolean enabled = true;

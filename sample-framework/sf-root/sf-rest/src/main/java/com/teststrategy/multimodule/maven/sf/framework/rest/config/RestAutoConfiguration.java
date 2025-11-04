@@ -35,7 +35,7 @@ import java.time.Duration;
  * - Adds optional interceptors (token/header-forwarding/correlation) based on properties
  */
 @AutoConfiguration
-@EnableConfigurationProperties({HttpClientProperties.class, OAuthClientProperties.class, ForwardHeadersProperties.class, CorrelationProperties.class, HmacAuthProperties.class, ErrorHandlerProperties.class, HttpClientRetryProperties.class})
+@EnableConfigurationProperties({HttpClientProperties.class, OAuthClientProperties.class, ForwardHeadersProperties.class, CorrelationProperties.class, HmacAuthProperties.class, ErrorHandlerProperties.class, HttpClientRetryProperties.class, HttpClientEvictorProperties.class})
 public class RestAutoConfiguration {
 
     @Bean
@@ -129,20 +129,26 @@ public class RestAutoConfiguration {
     @Bean
     @ConditionalOnClass(CloseableHttpClient.class)
     @ConditionalOnProperty(prefix = HttpClientRetryProperties.PREFIX, name = "enabled", havingValue = "true")
-    public CloseableHttpClient httpClientWithRetry(HttpClientProperties httpProps,
-                                                   HttpRequestRetryStrategy retryStrategy) {
-        PoolingHttpClientConnectionManager cm = PoolingHttpClientConnectionManagerBuilder.create()
+    public PoolingHttpClientConnectionManager httpClientConnectionManager(HttpClientProperties httpProps) {
+        return PoolingHttpClientConnectionManagerBuilder.create()
                 .setMaxConnTotal(httpProps.getMaxConnTotal())
                 .setMaxConnPerRoute(httpProps.getMaxConnPerRoute())
                 .build();
+    }
 
+    @Bean
+    @ConditionalOnClass(CloseableHttpClient.class)
+    @ConditionalOnProperty(prefix = HttpClientRetryProperties.PREFIX, name = "enabled", havingValue = "true")
+    public CloseableHttpClient httpClientWithRetry(HttpClientProperties httpProps,
+                                                   HttpRequestRetryStrategy retryStrategy,
+                                                   PoolingHttpClientConnectionManager connectionManager) {
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(Timeout.ofMilliseconds(httpProps.getConnectTimeout().toMillis()))
                 .setResponseTimeout(Timeout.ofMilliseconds(httpProps.getReadTimeout().toMillis()))
                 .build();
 
         return HttpClients.custom()
-                .setConnectionManager(cm)
+                .setConnectionManager(connectionManager)
                 .setRetryStrategy(retryStrategy)
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections()
@@ -158,15 +164,57 @@ public class RestAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(DomainProperties.class)
-    public RestTemplateCustomizer domainUriTemplateHandlerCustomizer(DomainProperties domainProperties,
-                                                                     ObjectProvider<DomainApiProperties> domainApiProperties,
-                                                                     Environment environment) {
-        return restTemplate -> restTemplate.setUriTemplateHandler(
-                new com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainUriTemplateHandler(
-                        domainProperties,
-                        domainApiProperties.getIfAvailable(),
-                        environment
-                )
+    @ConditionalOnMissingBean
+    public com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainUriTemplateHandler domainUriTemplateHandler(
+            DomainProperties domainProperties,
+            ObjectProvider<DomainApiProperties> domainApiProperties,
+            Environment environment) {
+        return new com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainUriTemplateHandler(
+                domainProperties,
+                domainApiProperties.getIfAvailable(),
+                environment
+        );
+    }
+
+    @Bean
+    @ConditionalOnBean(DomainProperties.class)
+    public com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorFinalizer uriTemplateHandlerInterceptorFinalizer() {
+        return new com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorFinalizer();
+    }
+
+    @Bean
+    @ConditionalOnBean(DomainProperties.class)
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+    public com.teststrategy.multimodule.maven.sf.framework.rest.client.DtoUriTemplateHandler dtoUriTemplateHandler() {
+        return new com.teststrategy.multimodule.maven.sf.framework.rest.client.DtoUriTemplateHandler();
+    }
+
+    @Bean
+    @ConditionalOnBean(DomainProperties.class)
+    public com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorBinder uriTemplateHandlerInterceptorBinder(
+            org.springframework.beans.factory.ObjectProvider<com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorChain> chainsProvider,
+            com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorFinalizer finalizer) {
+        return new com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorBinder(chainsProvider, finalizer);
+    }
+
+    @Bean
+    @ConditionalOnBean(DomainProperties.class)
+    public RestTemplateCustomizer uriTemplateHandlerChainCustomizer(
+            com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorBinder binder) {
+        return restTemplate -> restTemplate.setUriTemplateHandler(binder.bind());
+    }
+
+    @Bean
+    @ConditionalOnClass(org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager.class)
+    @ConditionalOnBean(org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager.class)
+    @ConditionalOnProperty(prefix = com.teststrategy.multimodule.maven.sf.framework.rest.setting.HttpClientEvictorProperties.PREFIX, name = "enabled", havingValue = "true")
+    public com.teststrategy.multimodule.maven.sf.framework.rest.client.IdleConnectionEvictor idleConnectionEvictor(
+            org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager connectionManager,
+            com.teststrategy.multimodule.maven.sf.framework.rest.setting.HttpClientEvictorProperties evictorProperties) {
+        return new com.teststrategy.multimodule.maven.sf.framework.rest.client.IdleConnectionEvictor(
+                connectionManager,
+                evictorProperties.getIdleTimeMillis(),
+                evictorProperties.getCheckIntervalMillis()
         );
     }
 }
