@@ -11,9 +11,7 @@ public class ApplicationContextUtil {
     private static ApplicationContext applicationContext;
 
     public static void setApplicationContext(ApplicationContext context) throws BeansException {
-        if (applicationContext == null) {
-            applicationContext = context;
-        }
+        applicationContext = context;
     }
 
     public static Object getBean(Class<?> clazz) {
