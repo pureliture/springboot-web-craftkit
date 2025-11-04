@@ -18,3 +18,5 @@ target/
 logs/
 .run/
 ps_*
+/.junie/guidelines.md
+/.githooks/pre-commit
