@@ -18,6 +18,7 @@
         <module>sf-eventuate-sleuth</module>
         <module>sf-kafka</module>
         <module>sf-hystrix</module>
+        <module>sf-rest</module>
     </modules>
 
     <properties>
@@ -26,6 +27,7 @@
         <sf-eventuate-sleuth.version>1.0.0-SNAPSHOT</sf-eventuate-sleuth.version>
         <sf-kafka.version>1.0.0-SNAPSHOT</sf-kafka.version>
         <sf-hystrix.version>1.0.0-SNAPSHOT</sf-hystrix.version>
+        <sf-rest.version>1.0.0-SNAPSHOT</sf-rest.version>
     </properties>
 
     <build>

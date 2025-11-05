@@ -32,7 +32,7 @@ public class SampleFrameworkCoreApplicationContextInitializer
 
     /**
      * Spring 에서는 기본으로 AnnotationBeanNameGenerator 를 사용하는데, BeanName 이 중복될 경우 기동오류가 발생하므로,
-     *  BeanName 이 중복될 경우 FullyQualifiedName(package+class)로 BeanName 을 생성한다.
+     * CustomAnnotationBeanNameGenerator 에서는 BeanName 이 중복될 경우 FullyQualifiedName(package+class)로 BeanName 을 생성한다.
      *
      * 단, @Component, @Service, @Repository, ... 등의 Class 기반 BeanName 에 적용되며 @Bean 을 사용하는 MethodBean에는
      * 적용되지 않는다.
