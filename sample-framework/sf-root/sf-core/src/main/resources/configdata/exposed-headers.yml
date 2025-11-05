@@ -1,0 +1,11 @@
+# Default global exposed headers for sf-core consumers.
+# Keep defaults minimal; applications can override via their own application.yml or additional imports.
+sf:
+  custom-attributes:
+    global:
+      exposed-headers:
+        # To provide defaults, define either 'set' or 'add' here.
+        # set:
+        #   - X-Example
+        # add:
+        #   - X-Another

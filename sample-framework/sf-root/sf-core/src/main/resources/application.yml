@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: sf-core
+  config:
+    import:
+      - "optional:configserver:"
+      - "classpath:configdata/common.yml"
+      - "classpath:configdata/exposed-headers.yml"

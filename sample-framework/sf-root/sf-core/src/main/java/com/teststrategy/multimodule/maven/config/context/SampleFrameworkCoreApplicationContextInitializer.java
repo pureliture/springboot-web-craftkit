@@ -2,6 +2,7 @@ package com.teststrategy.multimodule.maven.config.context;
 
 import com.teststrategy.multimodule.maven.sf.framework.application.SampleFrameworkAnnotationBeanNameGenerator;
 import com.teststrategy.multimodule.maven.sf.framework.resource.RetryableUrlResource;
+import com.teststrategy.multimodule.maven.sf.framework.scope.ExposedCustomAttributeNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
@@ -9,7 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.core.env.Environment;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.util.Optional;
 
@@ -42,13 +43,16 @@ public class SampleFrameworkCoreApplicationContextInitializer
 
         registerSingletonBeanNameGenerator(applicationContext);
 
+        // Initialize exposed headers from ConfigData-backed Environment (no manual PropertySource injection)
+        ExposedCustomAttributeNames.initializeFromEnvironment((ConfigurableEnvironment) applicationContext.getEnvironment());
+
         setRetryableUrlResourcePolicy(applicationContext);
     }
 
 
     // URL 리소스로 컨피그서버의 리소스를 가져올때 일시적 장애가 발생하면 Retry 정책을 동일하게 적용한다.
     private void setRetryableUrlResourcePolicy(ConfigurableApplicationContext applicationContext) {
-        Environment environment = applicationContext.getEnvironment();
+        ConfigurableEnvironment environment = applicationContext.getEnvironment();
 
         try {
             Optional.ofNullable(environment.getProperty("spring.cloud.config.retry.initial-interval", long.class))
@@ -80,8 +84,14 @@ public class SampleFrameworkCoreApplicationContextInitializer
     }
 
     private void registerSingletonBeanNameGenerator(ConfigurableApplicationContext applicationContext) {
+        var beanFactory = applicationContext.getBeanFactory();
+        String beanName = AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
+        if (beanFactory.containsSingleton(beanName)) {
+            // Already registered (possibly by another initializer or Boot defaults), skip re-registration
+            log.debug("ApplicationContextInitializer: BeanNameGenerator already registered, skipping");
+            return;
+        }
         log.info("ApplicationContextInitializer: BeanNameGenerator SampleFrameworkAnnotationBeanNameGenerator is registered!");
-        applicationContext.getBeanFactory()
-                .registerSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR, new SampleFrameworkAnnotationBeanNameGenerator());
+        beanFactory.registerSingleton(beanName, new SampleFrameworkAnnotationBeanNameGenerator());
     }
 }
