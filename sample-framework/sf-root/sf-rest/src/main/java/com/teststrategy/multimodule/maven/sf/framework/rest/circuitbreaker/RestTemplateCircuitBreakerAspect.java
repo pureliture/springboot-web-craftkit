@@ -2,7 +2,7 @@ package com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker;
 
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainApiContext;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -29,11 +29,11 @@ import java.util.function.Function;
 public class RestTemplateCircuitBreakerAspect {
 
     private final CircuitBreakerFactory<?, ?> factory;
-    private final CircuitBreakerProperties properties;
+    private final SfRestCircuitBreakerProperties properties;
     private final CircuitBreakerInstanceNamer namer;
 
     public RestTemplateCircuitBreakerAspect(CircuitBreakerFactory<?, ?> factory,
-                                            CircuitBreakerProperties properties,
+                                            SfRestCircuitBreakerProperties properties,
                                             CircuitBreakerInstanceNamer namer) {
         this.factory = factory;
         this.properties = properties;
@@ -52,7 +52,7 @@ public class RestTemplateCircuitBreakerAspect {
 
     @Around("anyRestTemplateMethod()")
     public Object aroundRestOperations(ProceedingJoinPoint pjp) throws Throwable {
-        if (!properties.isEnabled() || properties.getMode() != CircuitBreakerProperties.Mode.AOP) {
+        if (!properties.isEnabled() || properties.getMode() != SfRestCircuitBreakerProperties.Mode.AOP) {
             return pjp.proceed();
         }
         Object[] args = pjp.getArgs();

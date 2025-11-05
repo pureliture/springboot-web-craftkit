@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.client;
 
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
@@ -24,13 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class CircuitBreakerInterceptor implements ClientHttpRequestInterceptor {
 
     private final CircuitBreakerRegistry registry;
-    private final CircuitBreakerProperties properties;
+    private final SfRestCircuitBreakerProperties properties;
     private final CircuitBreakerInstanceNamer namer;
     private final List<Class<? extends Throwable>> ignoreExceptions;
     private final List<Class<? extends Throwable>> recordExceptions;
 
     public CircuitBreakerInterceptor(CircuitBreakerRegistry registry,
-                                     CircuitBreakerProperties properties,
+                                     SfRestCircuitBreakerProperties properties,
                                      CircuitBreakerInstanceNamer namer) {
         this.registry = registry;
         this.properties = properties;

@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.client;
 
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import org.springframework.http.HttpRequest;
 
 import java.net.URI;
@@ -13,14 +13,14 @@ import java.util.Locale;
  */
 public class CircuitBreakerInstanceNamer {
 
-    private final CircuitBreakerProperties properties;
+    private final SfRestCircuitBreakerProperties properties;
 
-    public CircuitBreakerInstanceNamer(CircuitBreakerProperties properties) {
+    public CircuitBreakerInstanceNamer(SfRestCircuitBreakerProperties properties) {
         this.properties = properties;
     }
 
     public String name(HttpRequest request) {
-        if (properties.getInstanceFrom() == CircuitBreakerProperties.InstanceFrom.DOMAIN_API) {
+        if (properties.getInstanceFrom() == SfRestCircuitBreakerProperties.InstanceFrom.DOMAIN_API) {
             String id = DomainApiContext.getCurrentDomainApi();
             if (id != null && !id.isBlank()) {
                 return id;

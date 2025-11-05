@@ -2,7 +2,7 @@ package com.teststrategy.multimodule.maven.sf.framework.rest;
 
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.DomainApiContext;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +20,8 @@ public class CircuitBreakerInstanceNamerTest {
 
     @Test
     void usesDomainApi_whenAvailable() {
-        CircuitBreakerProperties props = new CircuitBreakerProperties();
-        props.setInstanceFrom(CircuitBreakerProperties.InstanceFrom.DOMAIN_API);
+        SfRestCircuitBreakerProperties props = new SfRestCircuitBreakerProperties();
+        props.setInstanceFrom(SfRestCircuitBreakerProperties.InstanceFrom.DOMAIN_API);
         CircuitBreakerInstanceNamer namer = new CircuitBreakerInstanceNamer(props);
 
         DomainApiContext.setCurrentDomainApi("apim.resource");
@@ -31,8 +31,8 @@ public class CircuitBreakerInstanceNamerTest {
 
     @Test
     void fallsBackToMethodAndHost_whenNoDomainApi() {
-        CircuitBreakerProperties props = new CircuitBreakerProperties();
-        props.setInstanceFrom(CircuitBreakerProperties.InstanceFrom.DOMAIN_API);
+        SfRestCircuitBreakerProperties props = new SfRestCircuitBreakerProperties();
+        props.setInstanceFrom(SfRestCircuitBreakerProperties.InstanceFrom.DOMAIN_API);
         CircuitBreakerInstanceNamer namer = new CircuitBreakerInstanceNamer(props);
 
         HttpRequest req = new StubRequest(URI.create("http://EXAMPLE.org:8080/test"), HttpMethod.POST);

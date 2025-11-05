@@ -2,7 +2,7 @@ package com.teststrategy.multimodule.maven.sf.framework.rest;
 
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInterceptor;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class CircuitBreakerInterceptorTest {
                 .build();
         CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(cfg);
 
-        CircuitBreakerProperties props = new CircuitBreakerProperties();
+        SfRestCircuitBreakerProperties props = new SfRestCircuitBreakerProperties();
         CircuitBreakerInstanceNamer namer = new CircuitBreakerInstanceNamer(props);
         CircuitBreakerInterceptor interceptor = new CircuitBreakerInterceptor(registry, props, namer);
 
@@ -53,7 +53,7 @@ public class CircuitBreakerInterceptorTest {
     @Test
     void passesThrough_onSuccess() throws IOException {
         CircuitBreakerRegistry registry = CircuitBreakerRegistry.ofDefaults();
-        CircuitBreakerProperties props = new CircuitBreakerProperties();
+        SfRestCircuitBreakerProperties props = new SfRestCircuitBreakerProperties();
         CircuitBreakerInstanceNamer namer = new CircuitBreakerInstanceNamer(props);
         CircuitBreakerInterceptor interceptor = new CircuitBreakerInterceptor(registry, props, namer);
 

@@ -3,7 +3,7 @@ package com.teststrategy.multimodule.maven.sf.framework.rest.config;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.BusinessErrorDetectingInterceptor;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInterceptor;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -19,8 +19,8 @@ import java.util.List;
 
 @AutoConfiguration
 @ConditionalOnClass({RestTemplate.class, CircuitBreakerRegistry.class})
-@EnableConfigurationProperties(CircuitBreakerProperties.class)
-@ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
+@EnableConfigurationProperties(SfRestCircuitBreakerProperties.class)
+@ConditionalOnProperty(prefix = SfRestCircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
 public class RestCircuitBreakerAutoConfiguration {
 
     @Bean
@@ -32,20 +32,20 @@ public class RestCircuitBreakerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public CircuitBreakerInstanceNamer circuitBreakerInstanceNamer(CircuitBreakerProperties props) {
+    public CircuitBreakerInstanceNamer circuitBreakerInstanceNamer(SfRestCircuitBreakerProperties props) {
         return new CircuitBreakerInstanceNamer(props);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public CircuitBreakerInterceptor circuitBreakerInterceptor(CircuitBreakerRegistry registry,
-                                                               CircuitBreakerProperties props,
+                                                               SfRestCircuitBreakerProperties props,
                                                                CircuitBreakerInstanceNamer namer) {
         return new CircuitBreakerInterceptor(registry, props, namer);
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "mode", havingValue = "INTERCEPTOR", matchIfMissing = false)
+    @ConditionalOnProperty(prefix = SfRestCircuitBreakerProperties.PREFIX, name = "mode", havingValue = "INTERCEPTOR", matchIfMissing = false)
     public RestTemplateCustomizer circuitBreakerRestTemplateCustomizer(CircuitBreakerInterceptor interceptor,
                                                                        ObjectProvider<BusinessErrorDetectingInterceptor> businessInterceptorProvider) {
         return restTemplate -> {

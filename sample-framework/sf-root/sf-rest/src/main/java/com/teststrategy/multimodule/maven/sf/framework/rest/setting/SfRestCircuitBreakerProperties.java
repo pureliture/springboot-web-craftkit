@@ -8,33 +8,33 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Properties to enable and tune Resilience4j CircuitBreaker integration for RestTemplate.
+ * RestTemplate를 위한 Resilience4j CircuitBreaker 통합을 활성화하고 조정하기 위한 설정.
  *
  * Prefix: sf-rest.circuitbreaker
  */
-@ConfigurationProperties(prefix = CircuitBreakerProperties.PREFIX)
-public class CircuitBreakerProperties {
+@ConfigurationProperties(prefix = SfRestCircuitBreakerProperties.PREFIX)
+public class SfRestCircuitBreakerProperties {
 
     public static final String PREFIX = "sf-rest.circuitbreaker";
 
-    /** Enable CircuitBreaker feature. */
+    /** CircuitBreaker 기능 활성화 여부. */
     private boolean enabled = false;
 
-    /** Select implementation mode: INTERCEPTOR or AOP (default). */
+    /** 구현 모드 선택: INTERCEPTOR 또는 AOP(기본). */
     private Mode mode = Mode.AOP;
 
-    /** Instance naming strategy. */
+    /** 인스턴스 이름 지정 전략. */
     private InstanceFrom instanceFrom = InstanceFrom.DOMAIN_API;
 
-    /** Optional base configuration name present in CircuitBreakerRegistry. */
+    /** CircuitBreakerRegistry에 존재하는 선택적 기본 구성 이름. */
     private String defaultConfig;
 
-    /** Exceptions to ignore (treated as success from CB perspective). FQCNs. */
+    /** 무시할 예외 목록(CB 관점에서 성공으로 간주). FQCN. */
     private Set<String> ignoreExceptions = new LinkedHashSet<>(
             Arrays.asList("com.teststrategy.multimodule.maven.sf.framework.rest.client.BusinessErrorException")
     );
 
-    /** Exceptions to record as failures (in addition to base config). FQCNs. */
+    /** 실패로 기록할 예외 목록(기본 구성 외에). FQCN. */
     private Set<String> recordExceptions = new LinkedHashSet<>();
 
     public enum InstanceFrom { DOMAIN_API, URI }

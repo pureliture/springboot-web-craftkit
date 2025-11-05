@@ -1,7 +1,7 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker;
 
 import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ApplicationListener;
@@ -13,11 +13,11 @@ import org.springframework.context.ApplicationListener;
 public class SfRestCircuitBreakerRegistryRefresher implements ApplicationListener<EnvironmentChangeEvent> {
 
     private final CircuitBreakerRegistry registry;
-    private final CircuitBreakerProperties sfProps;
+    private final SfRestCircuitBreakerProperties sfProps;
     private final DomainApiProperties domainApiProperties;
 
     public SfRestCircuitBreakerRegistryRefresher(CircuitBreakerRegistry registry,
-                                                 CircuitBreakerProperties sfProps,
+                                                 SfRestCircuitBreakerProperties sfProps,
                                                  DomainApiProperties domainApiProperties) {
         this.registry = registry;
         this.sfProps = sfProps;

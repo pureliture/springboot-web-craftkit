@@ -5,7 +5,7 @@ import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.RestT
 import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.SfResilience4jCircuitBreakerFactoryDelegator;
 import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.SfRestCircuitBreakerRegistryRefresher;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
-import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CircuitBreakerProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -18,8 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 @AutoConfiguration
 @ConditionalOnClass({RestTemplate.class, CircuitBreakerRegistry.class})
-@org.springframework.boot.context.properties.EnableConfigurationProperties(CircuitBreakerProperties.class)
-@ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "mode", havingValue = "AOP")
+@org.springframework.boot.context.properties.EnableConfigurationProperties(SfRestCircuitBreakerProperties.class)
+@ConditionalOnProperty(prefix = SfRestCircuitBreakerProperties.PREFIX, name = "mode", havingValue = "AOP")
 public class RestCircuitBreakerAopAutoConfiguration {
 
     @Bean
@@ -45,18 +45,18 @@ public class RestCircuitBreakerAopAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = SfRestCircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
     public RestTemplateCircuitBreakerAspect restTemplateCircuitBreakerAspect(SfResilience4jCircuitBreakerFactoryDelegator delegator,
-                                                                             CircuitBreakerProperties properties,
+                                                                             SfRestCircuitBreakerProperties properties,
                                                                              CircuitBreakerInstanceNamer namer) {
         return new RestTemplateCircuitBreakerAspect(delegator.getFactory(), properties, namer);
     }
 
     @Bean
     @org.springframework.boot.autoconfigure.condition.ConditionalOnBean(DomainApiProperties.class)
-    @ConditionalOnProperty(prefix = CircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
+    @ConditionalOnProperty(prefix = SfRestCircuitBreakerProperties.PREFIX, name = "enabled", havingValue = "true")
     public SfRestCircuitBreakerRegistryRefresher sfRestCircuitBreakerRegistryRefresher(CircuitBreakerRegistry registry,
-                                                                                       CircuitBreakerProperties properties,
+                                                                                       SfRestCircuitBreakerProperties properties,
                                                                                        DomainApiProperties dap) {
         return new SfRestCircuitBreakerRegistryRefresher(registry, properties, dap);
     }
