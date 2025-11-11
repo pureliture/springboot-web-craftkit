@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 
 import lombok.Getter;

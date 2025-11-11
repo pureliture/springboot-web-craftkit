@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 시스템(기술) 측면의 실패를 표현하는 예외의 상위 추상 클래스입니다.

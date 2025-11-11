@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 비즈니스 관점에서의 "검증" 실패(도메인 규칙 유효성 점검 포함)를 표현하는 예외입니다.

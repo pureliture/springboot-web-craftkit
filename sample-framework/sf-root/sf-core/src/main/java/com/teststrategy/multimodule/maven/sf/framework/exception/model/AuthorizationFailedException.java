@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 403 Forbidden 수준의 인가(Authorization) 실패를 표현하는 예외입니다.

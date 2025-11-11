@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 500 Internal Server Error 수준의 내부 프로그래밍 오류/예상치 못한 실패를 표현하는 예외입니다.

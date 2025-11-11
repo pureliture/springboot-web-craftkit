@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 503 Service Unavailable 수준의 외부 시스템(인프라) 장애를 표현하는 예외입니다.

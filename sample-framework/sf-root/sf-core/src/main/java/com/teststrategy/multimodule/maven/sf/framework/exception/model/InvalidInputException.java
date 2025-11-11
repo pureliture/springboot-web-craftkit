@@ -1,4 +1,4 @@
-package com.teststrategy.multimodule.maven.sf.framework.exception;
+package com.teststrategy.multimodule.maven.sf.framework.exception.model;
 
 /**
  * 400 Bad Request 수준의 클라이언트 입력 오류(유효성 검증 실패, 타입 불일치, JSON 파싱 실패 등)에 대한
