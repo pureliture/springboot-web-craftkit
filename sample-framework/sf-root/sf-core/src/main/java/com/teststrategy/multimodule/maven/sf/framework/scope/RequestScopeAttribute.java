@@ -4,15 +4,12 @@ import com.teststrategy.multimodule.maven.sf.framework.application.constant.Comm
 import com.teststrategy.multimodule.maven.sf.framework.application.constant.HeaderConstant;
 import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpHeaderConstant;
 
-import java.util.List;
 import java.util.Map;
 
 public interface RequestScopeAttribute {
 
     String EMPTY = CommonConstant.INITIALIZE_VALUE_OF_EMPTY;
     String UNDEFINED_IP = HttpHeaderConstant.UNDEFINED_IP;
-
-    List<String> UNDEFINED_FIXED_FORWARDED_SERVICE = HeaderConstant.UNDEFINED_FIXED_FORWARDED_SERVICE;
 
     String GLOBAL_TRANSACTION_ID = HeaderConstant.HEADER_GLOBAL_TRANSACTION_ID;
     String USER_ID = HeaderConstant.HEADER_USER_ID;

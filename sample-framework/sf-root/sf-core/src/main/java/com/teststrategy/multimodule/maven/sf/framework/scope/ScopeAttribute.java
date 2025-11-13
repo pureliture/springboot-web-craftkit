@@ -1,6 +1,5 @@
 package com.teststrategy.multimodule.maven.sf.framework.scope;
 
-import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,13 +8,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.teststrategy.multimodule.maven.sf.framework.util.PropertyUtil;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ClassUtils;
+import org.slf4j.event.Level;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 
 import java.time.LocalDateTime;
@@ -23,7 +25,7 @@ import java.util.*;
 
 @Slf4j
 @JsonFilter("scopeAttributeJsonFilter")
-public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
+public class ScopeAttribute implements RequestScopeAttribute {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String userId = null;
@@ -44,6 +46,7 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
     /**
      * 개인정보 로깅용 클라이언트 IP
      */
+    @Setter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String clientIp = UNDEFINED_IP;
 
@@ -51,6 +54,7 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> privateClaims = new LinkedCaseInsensitiveMap<>();
 
+    @Getter
     @JsonProperty
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Map<String, Object> customAttributes = new LinkedCaseInsensitiveMap<>();
@@ -58,6 +62,7 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
     @JsonIgnore
     private Map<String, Object> localAttributes = new LinkedCaseInsensitiveMap<>();
 
+    @Setter
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String gtid = "";
 
@@ -66,6 +71,55 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> forwardedService = new ArrayList<>();
+
+    public ScopeAttribute() {
+    }
+
+    // 복사 생성자 (기존 clone() 동작 이전)
+    public ScopeAttribute(ScopeAttribute source) {
+        // read only
+        this.privateClaims = source.privateClaims;
+
+        try {
+            this.customAttributes = cloneMap(source.customAttributes, "customAttributes");
+        } catch (Exception e) {
+            log.warn("ScopeAttribute customAttributes 복제 오류 무시");
+            this.customAttributes = source.customAttributes;
+        }
+
+        try {
+            this.localAttributes = cloneMap(source.localAttributes, "localAttributes");
+        } catch (Exception e) {
+            log.warn("ScopeAttribute localAttributes 복제 오류 무시");
+            this.localAttributes = source.localAttributes;
+        }
+
+        try {
+            if (source.logLevel != null)
+                this.setLogLevel(source.getLogLevel().toString());
+        } catch (Exception e) {
+            log.warn("ScopeAttribute LogLevel 복제 오류 무시");
+        }
+        try {
+            this.forwardedService = new ArrayList<>();
+            source.forwardedService.forEach(this::addForwardedService);
+        } catch (Exception e) {
+            log.warn("ScopeAttribute forwardedService 복제 오류 무시");
+            this.forwardedService = source.forwardedService;
+        }
+
+        // 나머지 단순 필드 복사
+        this.userId = source.userId;
+        this.applicationName = source.applicationName;
+        this.programId = source.programId;
+        this.clientIp = source.clientIp;
+        this.gtid = source.gtid;
+    }
+
+    // 정적 팩토리
+    public static ScopeAttribute of(ScopeAttribute source) {
+        return new ScopeAttribute(source);
+    }
 
     @Override
     public String getUserId() {
@@ -78,21 +132,29 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
     }
 
     @Override
-    public String getApplicationName() { return applicationName; }
+    public String getApplicationName() {
+        return applicationName;
+    }
 
     @Override
-    public void setApplicationName(String applicationName) { this.applicationName = applicationName; }
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
 
     @Override
-    public String getProgramId() { return programId; }
+    public String getProgramId() {
+        return programId;
+    }
 
     @Override
-    public void setProgramId(String programId) { this.programId = programId; }
+    public void setProgramId(String programId) {
+        this.programId = programId;
+    }
 
     @Override
-    public String getClientIp() { return clientIp; }
-
-    public void setClientIp(String clientIp) { this.clientIp = clientIp; }
+    public String getClientIp() {
+        return clientIp;
+    }
 
     @Override
     public Map<String, Object> getPrivateClaims() {
@@ -123,10 +185,6 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
         } catch (JsonProcessingException e) {
             log.error("ScopeAttribute setPrivatClaims(String) descrialize error {}", privateClaimsString, e);
         }
-    }
-
-    public Map<String, Object> getCustomAttributes() {
-        return customAttributes;
     }
 
     @Override
@@ -180,11 +238,6 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
     @JsonIgnore
     public Object getLocalAttribute(String key) {
         return localAttributes.get(key);
-    }
-
-    public ScopeAttribute setGtid(String gtid) {
-        this.gtid = gtid;
-        return this;
     }
 
     @Override
@@ -300,40 +353,7 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
                 LocalDateTime.now());
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        ScopeAttribute clone = (ScopeAttribute) super.clone();
-
-        // read only
-        clone.privateClaims = this.privateClaims;
-
-        try {
-            clone.customAttributes = cloneMap(this.customAttributes, "customAttributes");
-        } catch (Exception e) {
-            log.warn("ScopeAttribute customAttributes 복제 오류 무시");
-        }
-
-        try {
-            clone.localAttributes = cloneMap(this.localAttributes, "localAttributes");
-        } catch (Exception e) {
-            log.warn("ScopeAttribute localAttributes 복제 오류 무시");
-        }
-
-        try {
-            if (this.logLevel != null)
-                clone.setLogLevel(this.getLogLevel().toString());
-        } catch (Exception e) {
-            log.warn("ScopeAttribute LogLevel 복제 오류 무시");
-        }
-        try {
-            clone.forwardedService = new ArrayList<>();
-            this.forwardedService.forEach(clone::addForwardedService);
-        } catch (Exception e) {
-            log.warn("ScopeAttribute forwardedService 복제 오류 무시");
-        }
-
-        return clone;
-    }
+    // 기존 clone() 제거 (S2975 준수)
 
     private Map<String, Object> cloneMap(Map<String, Object> source, String propertyName) {
         Map<String, Object> cloned = new LinkedCaseInsensitiveMap<>();
@@ -363,12 +383,12 @@ public class ScopeAttribute implements RequestScopeAttribute, Cloneable {
         StringBuilder builder = new StringBuilder();
 
         // @formatter:off
-        builder.append("ScopeAttribute [userId=") .append(userId)
-                .append(", forwardedService=") .append(forwardedService)
-                .append(", gtid=") .append(gtid)
-                .append(", customAttributes=") .append(customAttributes)
-                .append(", localAttributes=") .append(localAttributes)
-                .append(", logLevel=") .append(logLevel)
+        builder.append("ScopeAttribute [userId=").append(userId)
+                .append(", forwardedService=").append(forwardedService)
+                .append(", gtid=").append(gtid)
+                .append(", customAttributes=").append(customAttributes)
+                .append(", localAttributes=").append(localAttributes)
+                .append(", logLevel=").append(logLevel)
                 .append("]");
         return builder.toString();
         // @formatter:on

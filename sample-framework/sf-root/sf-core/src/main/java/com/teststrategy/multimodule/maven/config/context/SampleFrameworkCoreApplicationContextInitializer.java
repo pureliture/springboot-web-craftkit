@@ -22,7 +22,7 @@ import java.util.Optional;
  */
 @Configuration
 public class SampleFrameworkCoreApplicationContextInitializer
-        implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered  {
+        implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
     static Logger log = LoggerFactory.getLogger(SampleFrameworkCoreApplicationContextInitializer.class);
 
@@ -44,7 +44,7 @@ public class SampleFrameworkCoreApplicationContextInitializer
         registerSingletonBeanNameGenerator(applicationContext);
 
         // Initialize exposed headers from ConfigData-backed Environment (no manual PropertySource injection)
-        ExposedCustomAttributeNames.initializeFromEnvironment((ConfigurableEnvironment) applicationContext.getEnvironment());
+        ExposedCustomAttributeNames.initializeFromEnvironment(applicationContext.getEnvironment());
 
         setRetryableUrlResourcePolicy(applicationContext);
     }
@@ -84,14 +84,18 @@ public class SampleFrameworkCoreApplicationContextInitializer
     }
 
     private void registerSingletonBeanNameGenerator(ConfigurableApplicationContext applicationContext) {
+
         var beanFactory = applicationContext.getBeanFactory();
         String beanName = AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR;
+
         if (beanFactory.containsSingleton(beanName)) {
             // Already registered (possibly by another initializer or Boot defaults), skip re-registration
             log.debug("ApplicationContextInitializer: BeanNameGenerator already registered, skipping");
             return;
         }
+
         log.info("ApplicationContextInitializer: BeanNameGenerator SampleFrameworkAnnotationBeanNameGenerator is registered!");
+
         beanFactory.registerSingleton(beanName, new SampleFrameworkAnnotationBeanNameGenerator());
     }
 }

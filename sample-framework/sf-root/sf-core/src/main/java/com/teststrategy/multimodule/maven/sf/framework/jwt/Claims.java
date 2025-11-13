@@ -1,6 +1,7 @@
 package com.teststrategy.multimodule.maven.sf.framework.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 
@@ -58,24 +59,34 @@ public class Claims {
         NOT_ALLOWED_PRIVATE_CLAIM_NAMES = Collections.unmodifiableSet(claimSet);
     }
 
-    /**
-     * token type (access-token, refresh-token, temporary-token)
-     */
+    @Getter
     JwtType tokenType;
 
+    @Getter
     private String jti;
+
+    @Getter
     private String issuer;
 
-    private String intgUserId; // sub
-
+    @Getter
     private List<String> groups = new ArrayList<>(); // aud
+
+    @Getter
     private ZonedDateTime issueAt = ZonedDateTime.now(); // iat
+
+    @Getter
     private ZonedDateTime expireAt; // exp
 
+    @Getter
     private String clientIp;
+
+    @Getter
     private String authenticatedIp;
+
+    @Getter
     private String userId;
 
+    @Getter
     Map<String, Object> privateClaims = new LinkedHashMap<>();
 
     /**
@@ -171,22 +182,8 @@ public class Claims {
         return prefix + str;
     }
 
-    /**
-     * @return the tokenType
-     */
-    public JwtType getTokenType() {
-        return tokenType;
-    }
-
     public boolean isTypeOf(JwtType type) {
         return tokenType == type;
-    }
-
-    /**
-     * @return the jti
-     */
-    public String getJti() {
-        return jti;
     }
 
     /**
@@ -199,26 +196,12 @@ public class Claims {
     }
 
     /**
-     * @return the issuer
-     */
-    public String getIssuer() {
-        return issuer;
-    }
-
-    /**
      * @param issuer the issuer to set
      */
     public Claims setIssuer(String issuer) {
         if (issuer != null)
             this.issuer = issuer;
         return this;
-    }
-
-    /**
-     * @return the groups
-     */
-    public List<String> getGroups() {
-        return groups;
     }
 
     /**
@@ -231,13 +214,6 @@ public class Claims {
     }
 
     /**
-     * @return the issueAt
-     */
-    public ZonedDateTime getIssueAt() {
-        return issueAt;
-    }
-
-    /**
      * @param issueAt the issueAt to set
      */
     public Claims setIssueAt(ZonedDateTime issueAt) {
@@ -247,26 +223,12 @@ public class Claims {
     }
 
     /**
-     * @return the expireAt
-     */
-    public ZonedDateTime getExpireAt() {
-        return expireAt;
-    }
-
-    /**
      * @param expireAt the expireAt to set
      */
     public Claims setExpireAt(ZonedDateTime expireAt) {
         if (expireAt != null)
             this.expireAt = expireAt;
         return this;
-    }
-
-    /**
-     * @return the privateClaims
-     */
-    public Map<String, Object> getPrivateClaims() {
-        return privateClaims;
     }
 
     /**
@@ -298,20 +260,6 @@ public class Claims {
     }
 
     /**
-     * @return the userId
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * @return the clientIp
-     */
-    public String getClientIp() {
-        return clientIp;
-    }
-
-    /**
      * @param clientIp the clientIp to set
      */
     public Claims setClientIp(String clientIp) {
@@ -319,16 +267,6 @@ public class Claims {
         return this;
     }
 
-    /**
-     * @return the authenticatedIp
-     */
-    public String getAuthenticatedIp() {
-        return authenticatedIp;
-    }
-
-    /**
-     * @param authenticatedIp the authenticatedIp to set
-     */
     public Claims setAuthenticatedIp(String authenticatedIp) {
         this.authenticatedIp = authenticatedIp;
         return this;

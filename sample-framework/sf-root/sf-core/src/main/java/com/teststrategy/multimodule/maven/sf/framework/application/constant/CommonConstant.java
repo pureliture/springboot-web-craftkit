@@ -7,7 +7,6 @@ public class CommonConstant {
 
     private CommonConstant() { super(); }
 
-
     public static final Charset DEFAULT_CHARSETS = StandardCharsets.UTF_8;
     public static final String DEFAULT_ENCODING = DEFAULT_CHARSETS.toString();
 

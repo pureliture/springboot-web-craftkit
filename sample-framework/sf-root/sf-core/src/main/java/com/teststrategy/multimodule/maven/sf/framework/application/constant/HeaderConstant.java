@@ -3,8 +3,8 @@ package com.teststrategy.multimodule.maven.sf.framework.application.constant;
 import java.util.List;
 
 /**
- * Channel-agnostic header constants shared across transports (HTTP, Kafka, etc.).
- * Use these for headers that are always present regardless of channel.
+ * 전송 채널(HTTP, Kafka 등)과 무관하게 공통으로 사용하는 헤더 상수 모음입니다.
+ * 어떤 채널에서도 항상 존재하는(또는 사용할 수 있는) 헤더에 대해 이 상수를 사용하세요.
  */
 public final class HeaderConstant {
 
@@ -12,7 +12,7 @@ public final class HeaderConstant {
         throw new IllegalStateException("Utility class");
     }
 
-    // Common custom header keys
+    // 공통 커스텀 헤더 키
     public static final String HEADER_USER_ID = "USER-ID";
     public static final String HEADER_PROGRAM_ID = "PROGRAM-ID";
     public static final String HEADER_FORWARDED_SERVICE = "Forwarded-Service";
@@ -20,14 +20,14 @@ public final class HeaderConstant {
     public static final String HEADER_GLOBAL_TRANSACTION_ID = "Global-Transaction-ID";
     public static final String HEADER_LOGLEVEL_KEY = "LogLevel";
 
-    // Gateway signature header (transport-agnostic)
+    // 게이트웨이 서명 관련 헤더(전송 채널과 무관)
     public static final String HEADER_APPLICATION_NAME = "APPLICATION-NAME";
     public static final String HEADER_SIGNATURE = "Header-Authorization";
 
-    // Initialization/common values related to header composition
+    // 헤더 구성과 관련된 초기/공통 값
     public static final String HEADER_DATE_TIMEFORMAT = "yyyyMMdd'T'HHmmssZ";
 
     public static final String UNDEFINED_SERVICE = "undefined";
-    // fixed list :: could not add elements
+    // 고정 리스트 :: 요소 추가 불가
     public static final List<String> UNDEFINED_FIXED_FORWARDED_SERVICE = List.of(UNDEFINED_SERVICE);
 }

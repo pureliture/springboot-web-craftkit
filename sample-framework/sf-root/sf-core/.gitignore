@@ -45,6 +45,7 @@ bin/
 logs/
 pom.xml.versionsBackup
 allure-results/
+docs/junie/
 
 # maven-wrapper
 .mvn/
