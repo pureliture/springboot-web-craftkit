@@ -4,14 +4,12 @@ import com.teststrategy.multimodule.maven.sf.framework.properties.YamlResourcePr
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.*;
 import org.springframework.core.io.support.EncodedResource;
 
 import java.io.File;
@@ -19,9 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Manages logical domain (host) URLs and optional bulk-service URLs from a YAML file.
+ * YAML 파일에서 논리 도메인(호스트) URL을 로드/관리합니다.
  *
- * YAML format example:
+ * YAML 형식 예:
  * services:
  *   demo:
  *     url: http://localhost:8081
@@ -32,53 +30,58 @@ public class DomainProperties {
     private static final Logger log = LoggerFactory.getLogger(DomainProperties.class);
 
     /**
-     * Property key to locate a YAML file or directory containing domain.yml
+     * domain.yml을 포함하는 디렉터리 또는 YAML 파일의 위치를 찾기 위한 프로퍼티 키
      */
     public static final String CONFIG_PATH = "sf-rest.domain.config";
 
     /**
-     * Optional prefix only for documentation/backward hints.
+     * 문서화/이전 호환 힌트용 선택적 접두사
      */
     public static final String PREFIX = "sf-rest.domain";
 
     /**
-     * Services root key inside YAML.
+     * YAML 내 서비스 루트 키
      */
     public static final String SERVICES_KEY = "services";
 
     /**
-     * Location provided by Environment; kept for toString() and debugging.
+     * Environment로부터 주어진 설정 위치(디버깅 및 toString용)
      */
     private String config;
 
     @ToString.Exclude
-    private transient Environment environment;
+    private Environment environment;
 
     @ToString.Exclude
-    private transient ResourceLoader resourceLoader;
+    private ResourceLoader resourceLoader;
 
     /**
-     * Logical service name -> ServiceProperties mapping
+     * 논리 서비스명 -> ServiceProperties 매핑
      */
     private Map<String, ServiceProperties> services = new LinkedHashMap<>();
 
     public DomainProperties(Environment environment) {
-        this(environment, new org.springframework.core.io.DefaultResourceLoader());
+        this(environment, new DefaultResourceLoader());
     }
 
     public DomainProperties(Environment environment, ResourceLoader resourceLoader) {
+
         this.environment = environment;
-        this.resourceLoader = (resourceLoader != null) ? resourceLoader : new org.springframework.core.io.DefaultResourceLoader();
-        if (environment != null) {
-            String resolved = environment.getProperty(CONFIG_PATH);
-            this.config = resolved;
-            // best-effort load; missing file is tolerated
-            if (StringUtils.isNotBlank(resolved)) {
-                try {
-                    loadFromYaml(resolved);
-                } catch (Exception e) {
-                    log.warn("Failed to load domain YAML from {}: {}", resolved, e.getMessage());
-                }
+        this.resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader();
+
+        if (environment == null) {
+            return;
+        }
+
+        String resolved = environment.getProperty(CONFIG_PATH);
+        this.config = resolved;
+
+        // 가능한 경우에만 로드; 파일 누락은 허용
+        if (StringUtils.isNotBlank(resolved)) {
+            try {
+                this.loadFromYaml(resolved);
+            } catch (Exception e) {
+                log.warn("도메인 YAML을 {}에서 로드하지 못했습니다: {}", resolved, e.getMessage());
             }
         }
     }
@@ -103,9 +106,7 @@ public class DomainProperties {
     public String getDomainUrl(final String domainName, final boolean isBulkRequest) {
         final ServiceProperties service = this.getServices().get(domainName);
         if (service == null) return null;
-        if (isBulkRequest && service.hasBsv()) {
-            return service.getBsvUrl();
-        }
+        // bsvUrl 개념 제거: bulk 여부와 관계없이 기본 url만 반환
         return service.getUrl();
     }
 
@@ -116,38 +117,48 @@ public class DomainProperties {
                 return new FileSystemResource(file);
             }
         } catch (Exception ignored) {
+            // eat
         }
+
         try {
             if (this.resourceLoader != null) {
                 Resource res = this.resourceLoader.getResource(path);
-                if (res != null && res.exists()) {
+                if (res.exists()) {
                     return res;
                 }
             }
         } catch (Exception ignored) {
+            // eat
         }
+
         return new ClassPathResource(path);
     }
 
     private void loadFromYaml(String path) throws Exception {
-        Resource resource = resolveResource(path);
+
+        Resource resource = this.resolveResource(path);
+
         if (!resource.exists()) {
-            // if path is a directory, try domain.yml inside it
+            // 경로가 디렉터리인 경우 내부의 domain.yml 시도
             File f = new File(path);
             if (f.isDirectory()) {
                 resource = new FileSystemResource(new File(f, "domain.yml"));
             }
         }
+
         if (!resource.exists()) {
             if (log.isDebugEnabled()) {
-                log.debug("Domain YAML resource not found at {}", path);
+                log.debug("해당 위치에 도메인 YAML 리소스가 없습니다: {}", path);
             }
             return;
         }
+
         YamlResourcePropertySource ps = new YamlResourcePropertySource("domain", new EncodedResource(resource));
         String[] names = ps.getPropertyNames();
-        if (names == null || names.length == 0) return;
-        // parse properties like services.demo.url, services.demo.bsvUrl
+
+        if (ArrayUtils.isEmpty(names)) return;
+
+        // services.demo.url 형태의 프로퍼티 파싱
         Map<String, ServiceProperties> map = new LinkedHashMap<>();
         for (String key : names) {
             if (!key.startsWith(SERVICES_KEY + ".")) continue;
@@ -161,10 +172,9 @@ public class DomainProperties {
             ServiceProperties sp = map.computeIfAbsent(name, k -> new ServiceProperties());
             if ("url".equals(prop)) {
                 sp.setUrl(value);
-            } else if ("bsvUrl".equals(prop) || "bsv-url".equals(prop)) {
-                sp.setBsvUrl(value);
             }
         }
+
         if (!map.isEmpty()) {
             this.services.putAll(map);
         }
@@ -174,15 +184,10 @@ public class DomainProperties {
     @NoArgsConstructor
     public static class ServiceProperties {
         private String url;
-        private String bsvUrl;
-
-        public boolean hasBsv() {
-            return StringUtils.isNotBlank(this.bsvUrl);
-        }
 
         @Override
         public String toString() {
-            return "{svc=" + this.url + (this.hasBsv() ? (", bsv=" + this.bsvUrl) : "") + "}";
+            return "{svc=" + this.url + "}";
         }
     }
 

@@ -1,5 +1,6 @@
-package com.teststrategy.multimodule.maven.sf.framework.application.env;
+package com.teststrategy.multimodule.maven.sf.framework.rest.env;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.env.YamlPropertySourceLoader;
@@ -27,7 +28,9 @@ public class DomainPropertySourceLoadHelper {
 
     private static final Logger log = LoggerFactory.getLogger(DomainPropertySourceLoadHelper.class);
 
-    public static final String PROPERTY_KEY = "sf-rest.domain.config";
+    public static final String CONFIG_PATH = "sf-rest.domain.config";
+    private static final String DOMAIN_FILE_NAME = "domain.yml";
+    private static final String PROPERTY_SOURCE_NAME = "domain";
 
     private final ConfigurableEnvironment environment;
     private final ResourceLoader resourceLoader;
@@ -38,76 +41,64 @@ public class DomainPropertySourceLoadHelper {
     }
 
     public void load() {
-        String path = environment.getProperty(PROPERTY_KEY);
-        if (path == null || path.isBlank()) {
-            if (log.isDebugEnabled()) {
-                log.debug("{}가 설정되지 않았습니다. domain.yml 로드 건너뛰기.", PROPERTY_KEY);
-            }
+        String location = environment.getProperty(CONFIG_PATH);
+        if (StringUtils.isNotEmpty(location)) {
+            log.debug("{}가 설정되지 않았습니다. {} 로드 건너뛰기.", CONFIG_PATH, DOMAIN_FILE_NAME);
             return;
         }
 
-        Resource resource = resolveResource(path);
+        Resource resource = resolveLocation(location);
+
+        // 경로가 디렉터리면 내부의 domain.yml을 시도
         if (!resource.exists()) {
-            // 경로가 디렉토리인 경우, 그 안의 domain.yml을 시도합니다.
-            File f = new File(path);
-            if (f.isDirectory()) {
-                File candidate = new File(f, "domain.yml");
-                resource = new FileSystemResource(candidate);
+            File file = new File(location);
+            if (file.isDirectory()) {
+                resource = new FileSystemResource(new File(file, DOMAIN_FILE_NAME));
             }
         }
 
         if (!resource.exists()) {
-            log.warn("path: {}에 대한 domain.yml 리소스를 찾을 수 없습니다.", path);
+            log.warn("location: {}에 대한 {} 리소스를 찾을 수 없습니다.", location, DOMAIN_FILE_NAME);
             return;
         }
 
         try {
             YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
-            List<PropertySource<?>> propertySources = loader.load("domain", resource);
+            List<PropertySource<?>> propertySources = loader.load(PROPERTY_SOURCE_NAME, resource);
             MutablePropertySources envSources = environment.getPropertySources();
 
             for (PropertySource<?> ps : propertySources) {
-                // 중복된 PropertySource 이름을 피합니다.
                 if (envSources.contains(ps.getName())) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("PropertySource '{}'가 이미 존재합니다. 건너뜁니다.", ps.getName());
-                    }
+                    log.debug("PropertySource '{}'가 이미 존재합니다. 건너뜁니다.", ps.getName());
                     continue;
                 }
-                // 기존 애플리케이션 속성 값을 망가뜨리지 않도록 마지막에 추가합니다.
+                // 기존 애플리케이션 속성을 보존하기 위해 마지막에 추가
                 envSources.addLast(ps);
-                if (log.isInfoEnabled()) {
-                    log.info("도메인 속성을 {}에서 PropertySource '{}'로 로드했습니다.", resource, ps.getName());
-                }
+                log.info("도메인 속성을 {}에서 PropertySource '{}'로 로드했습니다.", resource, ps.getName());
             }
         } catch (IOException e) {
-            log.warn("{}", resource, e);
-            log.warn("domain.yml를 {}에서 로드하는 데 실패했습니다.", resource);
+            log.warn("리소스 {} 처리 중 예외가 발생했습니다.", resource, e);
+            log.warn("{}를 {}에서 로드하는 데 실패했습니다.", DOMAIN_FILE_NAME, resource);
         }
     }
 
-    private Resource resolveResource(String path) {
+    private Resource resolveLocation(String location) {
         try {
-            // 먼저 파일 시스템 경로로 시도
-            File file = new File(path);
+            File file = new File(location);
             if (file.exists()) {
                 return new FileSystemResource(file);
             }
         } catch (Exception ignored) {
-            // eat
+            // ignore
         }
-
-        // ResourceLoader를 통해 시도(예: classpath: 등 지원될 수 있음)
         try {
-            Resource res = resourceLoader.getResource(path);
-            if (res != null && res.exists()) {
+            Resource res = resourceLoader.getResource(location);
+            if (res.exists()) {
                 return res;
             }
         } catch (Exception ignored) {
-            // eat
+            // ignore
         }
-
-        // 기본: 클래스패스 상대 경로
-        return new ClassPathResource(path);
+        return new ClassPathResource(location);
     }
 }
