@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainApiProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;

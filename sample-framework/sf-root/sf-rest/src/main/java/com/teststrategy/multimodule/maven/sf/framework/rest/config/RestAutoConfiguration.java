@@ -1,8 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.*;
 import com.teststrategy.multimodule.maven.sf.framework.rest.setting.*;
 import org.apache.hc.client5.http.HttpRequestRetryStrategy;

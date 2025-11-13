@@ -1,8 +1,6 @@
-package com.teststrategy.multimodule.maven.sf.framework.application.setting;
+package com.teststrategy.multimodule.maven.sf.framework.rest.setting;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.teststrategy.multimodule.maven.sf.framework.properties.YamlResourcePropertySource;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -10,9 +8,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.EncodedResource;
 
-import java.io.InputStream;
-import java.util.Iterator;
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,10 +25,6 @@ import java.util.Map;
  * services:
  *   demo:
  *     url: http://localhost:8081
- *   apim-pv:
- *     url: http://localhost:8081/apim
- *   apim-pb:
- *     url: http://localhost:8082/apim
  */
 @Data
 public class DomainProperties {
@@ -56,13 +54,21 @@ public class DomainProperties {
     @ToString.Exclude
     private transient Environment environment;
 
+    @ToString.Exclude
+    private transient ResourceLoader resourceLoader;
+
     /**
      * Logical service name -> ServiceProperties mapping
      */
     private Map<String, ServiceProperties> services = new LinkedHashMap<>();
 
     public DomainProperties(Environment environment) {
+        this(environment, new org.springframework.core.io.DefaultResourceLoader());
+    }
+
+    public DomainProperties(Environment environment, ResourceLoader resourceLoader) {
         this.environment = environment;
+        this.resourceLoader = (resourceLoader != null) ? resourceLoader : new org.springframework.core.io.DefaultResourceLoader();
         if (environment != null) {
             String resolved = environment.getProperty(CONFIG_PATH);
             this.config = resolved;
@@ -103,30 +109,64 @@ public class DomainProperties {
         return service.getUrl();
     }
 
+    private Resource resolveResource(String path) {
+        try {
+            File file = new File(path);
+            if (file.exists()) {
+                return new FileSystemResource(file);
+            }
+        } catch (Exception ignored) {
+        }
+        try {
+            if (this.resourceLoader != null) {
+                Resource res = this.resourceLoader.getResource(path);
+                if (res != null && res.exists()) {
+                    return res;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return new ClassPathResource(path);
+    }
+
     private void loadFromYaml(String path) throws Exception {
-        // Resolve to resource InputStream using Spring's ResourceLoader via Environment if possible
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        try (InputStream is = ResourceResolver.openStream(path)) {
-            if (is == null) {
+        Resource resource = resolveResource(path);
+        if (!resource.exists()) {
+            // if path is a directory, try domain.yml inside it
+            File f = new File(path);
+            if (f.isDirectory()) {
+                resource = new FileSystemResource(new File(f, "domain.yml"));
+            }
+        }
+        if (!resource.exists()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Domain YAML resource not found at {}", path);
-                return;
             }
-            JsonNode root = mapper.readTree(is);
-            if (root == null || !root.has(SERVICES_KEY)) return;
-            JsonNode servicesNode = root.get(SERVICES_KEY);
-            Iterator<String> fieldNames = servicesNode.fieldNames();
-            while (fieldNames.hasNext()) {
-                String name = fieldNames.next();
-                JsonNode svc = servicesNode.get(name);
-                if (svc == null) continue;
-                ServiceProperties sp = new ServiceProperties();
-                JsonNode url = svc.get("url");
-                if (url != null && !url.isNull()) sp.setUrl(url.asText());
-                // support both bsvUrl and bsv-url
-                JsonNode bsvUrl = svc.has("bsvUrl") ? svc.get("bsvUrl") : svc.get("bsv-url");
-                if (bsvUrl != null && !bsvUrl.isNull()) sp.setBsvUrl(bsvUrl.asText());
-                this.services.put(name, sp);
+            return;
+        }
+        YamlResourcePropertySource ps = new YamlResourcePropertySource("domain", new EncodedResource(resource));
+        String[] names = ps.getPropertyNames();
+        if (names == null || names.length == 0) return;
+        // parse properties like services.demo.url, services.demo.bsvUrl
+        Map<String, ServiceProperties> map = new LinkedHashMap<>();
+        for (String key : names) {
+            if (!key.startsWith(SERVICES_KEY + ".")) continue;
+            String remainder = key.substring((SERVICES_KEY + ".").length());
+            int dot = remainder.indexOf('.');
+            if (dot <= 0) continue;
+            String name = remainder.substring(0, dot);
+            String prop = remainder.substring(dot + 1);
+            Object raw = ps.getProperty(key);
+            String value = raw != null ? String.valueOf(raw) : null;
+            ServiceProperties sp = map.computeIfAbsent(name, k -> new ServiceProperties());
+            if ("url".equals(prop)) {
+                sp.setUrl(value);
+            } else if ("bsvUrl".equals(prop) || "bsv-url".equals(prop)) {
+                sp.setBsvUrl(value);
             }
+        }
+        if (!map.isEmpty()) {
+            this.services.putAll(map);
         }
     }
 

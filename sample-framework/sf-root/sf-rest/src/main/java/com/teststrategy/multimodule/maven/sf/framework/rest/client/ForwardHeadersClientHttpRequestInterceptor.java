@@ -27,23 +27,22 @@ public class ForwardHeadersClientHttpRequestInterceptor implements ClientHttpReq
     }
 
     @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        if (properties.isEnabled()) {
-            HttpServletRequest inbound = currentRequest();
-            if (inbound != null) {
-                HttpHeaders headers = request.getHeaders();
-                List<String> names = properties.getNames();
-                if (names != null) {
-                    for (String name : names) {
-                        if (name == null || name.isEmpty()) continue;
-                        String value = inbound.getHeader(name);
-                        if (value != null && !value.isEmpty() && !headers.containsKey(name)) {
-                            headers.add(name, value);
-                        }
-                    }
-                }
-            }
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+            throws IOException {
+
+        if (!properties.isEnabled()) {
+            return execution.execute(request, body);
         }
+
+        HttpServletRequest inboundRequest = this.currentRequest();
+        if (inboundRequest == null) {
+            return execution.execute(request, body);
+        }
+
+        HttpHeaders outboundHeaders = request.getHeaders();
+        List<String> headerNames = properties.getNames();
+        this.copyHeadersIfAbsent(inboundRequest, outboundHeaders, headerNames);
+
         return execution.execute(request, body);
     }
 
@@ -54,5 +53,20 @@ public class ForwardHeadersClientHttpRequestInterceptor implements ClientHttpReq
             return sra.getRequest();
         }
         return null;
+    }
+
+    private void copyHeadersIfAbsent(HttpServletRequest inboundRequest, HttpHeaders outboundHeaders, @Nullable List<String> headerNames) {
+        if (headerNames == null || headerNames.isEmpty()) {
+            return;
+        }
+        for (String headerName : headerNames) {
+            if (!org.springframework.util.StringUtils.hasText(headerName)) {
+                continue;
+            }
+            String headerValue = inboundRequest.getHeader(headerName);
+            if (org.springframework.util.StringUtils.hasText(headerValue) && !outboundHeaders.containsKey(headerName)) {
+                outboundHeaders.add(headerName, headerValue);
+            }
+        }
     }
 }

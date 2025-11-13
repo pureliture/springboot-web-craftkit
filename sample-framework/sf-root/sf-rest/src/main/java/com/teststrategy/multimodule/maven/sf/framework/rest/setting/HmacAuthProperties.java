@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.setting;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpRequestConstant;
+import com.teststrategy.multimodule.maven.sf.framework.application.constant.HeaderConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = HmacAuthProperties.PREFIX)
@@ -17,7 +17,7 @@ public class HmacAuthProperties {
     private String secret;
 
     /** Header name to carry the signature. */
-    private String headerName = HttpRequestConstant.HTTP_HEADER_SIGNATURE;
+    private String headerName = HeaderConstant.HEADER_SIGNATURE;
 
     public boolean isEnabled() {
         return enabled;
