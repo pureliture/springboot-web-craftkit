@@ -4,32 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class HttpRequestConstant {
+/**
+ * HTTP-specific header constants and supporting values.
+ * Use these only for HTTP transport; combine with {@link HeaderConstant} as needed.
+ */
+public final class HttpHeaderConstant {
 
-    private HttpRequestConstant() {
-        super();
+    private HttpHeaderConstant() {
+        throw new IllegalStateException("Utility class");
     }
-    /**
-     *  constant of custom header keys
-     */
-    public static final String HTTP_HEADER_USER_ID = "USER-ID";
-    public static final String HTTP_HEADER_PROGRAM_ID = "PROGRAM-ID";
-    public static final String HTTP_HEADER_FORWARDED_SERVICE = "Forwarded-Service";
 
-    @Deprecated
-    public static final String HTTP_HEADER_X_FORWARDED_ATTRIBUTE = CommonConstant.FORWARDED_ATTRIBUTE;
-    public static final String HTTP_HEADER_TRANSACTION_ID = "Global-Transaction-ID";
-    public static final String HTTP_HEADER_LOGLEVEL_KEY = "LogLevel";
-
-    /**
-     * gateway signature header
-     */
-    public static final String HTTP_HEADER_APPLICATION_NAME = "APPLICATION-NAME";
-    public static final String HTTP_HEADER_SIGNATURE = "Header-Authorization";
-
-    /**
-     * constant of standard http keys
-     */
+    // Standard HTTP header keys (as used in this project)
     public static final String HTTP_HEADER_FORWARDED_FOR = "Forwarded-For";
     public static final String HTTP_HEADER_PROXY_CLIENT_IP = "Proxy-Client-IP";
     public static final String HTTP_HEADER_WL_PROXY_CLIENT_IP = "WL-Proxy-Client-IP";
@@ -41,15 +26,9 @@ public class HttpRequestConstant {
 
     public static final String HTTP_HEADER_BFF_CONTEXT_PATH = "BFF-Context-Path";
 
-    /**
-     * constant values for initialization
-     */
-    public static final String HTTP_HEADER_DATE_TIMEFORMAT = "yyyyMMdd'T'HHmmssZ";
+    // HTTP-only initialization/common values
     public static final String LOCALHOST = "127.0.0.1";
     public static final String UNDEFINED_IP = LOCALHOST;
-    public static final String UNDEFINED_SERVICE = "undefined";
-    // fixed list :: could not add elements
-    public static final List<String> UNDEFINED_FIXED_FORWARDED_SERVICE = List.of(UNDEFINED_SERVICE);
 
     @SuppressWarnings({"java:S3599", "java:S1171", "java:S2386"})
     public static final List<Pattern> COMMON_ENDPOINT_PATTERNS_LIST = new ArrayList<Pattern>() {
@@ -58,5 +37,4 @@ public class HttpRequestConstant {
             add(Pattern.compile("^(/[\\w-.]+)?/(public|actuator|webjars|swagger|v2/api-docs|h2(-console)?)"));
         }
     };
-
 }

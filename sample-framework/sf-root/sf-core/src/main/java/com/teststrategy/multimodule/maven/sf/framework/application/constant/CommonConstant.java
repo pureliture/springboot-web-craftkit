@@ -12,8 +12,6 @@ public class CommonConstant {
     public static final String DEFAULT_ENCODING = DEFAULT_CHARSETS.toString();
 
     public static final String INITIALIZE_VALUE_OF_EMPTY = "empty";
-    @Deprecated
-    public static final String FORWARDED_ATTRIBUTE = "Forwarded-Attribute";
 
     public static final String LOG_MDC_GTID = "gtid"; // log4j MDC 용
 }

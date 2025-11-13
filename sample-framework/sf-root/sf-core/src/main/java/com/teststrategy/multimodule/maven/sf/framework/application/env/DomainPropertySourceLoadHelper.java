@@ -65,6 +65,7 @@ public class DomainPropertySourceLoadHelper {
             YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
             List<PropertySource<?>> propertySources = loader.load("domain", resource);
             MutablePropertySources envSources = environment.getPropertySources();
+
             for (PropertySource<?> ps : propertySources) {
                 // 중복된 PropertySource 이름을 피합니다.
                 if (envSources.contains(ps.getName())) {
@@ -92,7 +93,9 @@ public class DomainPropertySourceLoadHelper {
             if (file.exists()) {
                 return new FileSystemResource(file);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // eat
+        }
 
         // ResourceLoader를 통해 시도(예: classpath: 등 지원될 수 있음)
         try {
@@ -100,7 +103,9 @@ public class DomainPropertySourceLoadHelper {
             if (res != null && res.exists()) {
                 return res;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            // eat
+        }
 
         // 기본: 클래스패스 상대 경로
         return new ClassPathResource(path);

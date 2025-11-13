@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.util;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpRequestConstant;
+import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpHeaderConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
@@ -44,26 +44,26 @@ public class HttpUtil {
 
     public static String getClientIp(HttpServletRequest request) {
 
-        String ip = extractClientIpByForwardedFor(request.getHeader(HttpRequestConstant.HTTP_HEADER_XFF));
+        String ip = extractClientIpByForwardedFor(request.getHeader(HttpHeaderConstant.HTTP_HEADER_XFF));
 
         if (isUnknownIp(ip)) {
-            ip = extractClientIpByForwardedFor(request.getHeader(HttpRequestConstant.HTTP_HEADER_FORWARDED_FOR));
+            ip = extractClientIpByForwardedFor(request.getHeader(HttpHeaderConstant.HTTP_HEADER_FORWARDED_FOR));
         }
         if (isUnknownIp(ip)) {
-            ip = request.getHeader(HttpRequestConstant.HTTP_HEADER_PROXY_CLIENT_IP);
+            ip = request.getHeader(HttpHeaderConstant.HTTP_HEADER_PROXY_CLIENT_IP);
         }
         if (isUnknownIp(ip)) {
-            ip = request.getHeader(HttpRequestConstant.HTTP_HEADER_WL_PROXY_CLIENT_IP);
+            ip = request.getHeader(HttpHeaderConstant.HTTP_HEADER_WL_PROXY_CLIENT_IP);
         }
         if (isUnknownIp(ip)) {
-            ip = request.getHeader(HttpRequestConstant.HTTP_HEADER_HTTP_CLIENT_IP);
+            ip = request.getHeader(HttpHeaderConstant.HTTP_HEADER_HTTP_CLIENT_IP);
         }
         if (isUnknownIp(ip)) {
-            ip = request.getHeader(HttpRequestConstant.HTTP_HEADER_HTTP_FORWARDED_FOR);
+            ip = request.getHeader(HttpHeaderConstant.HTTP_HEADER_HTTP_FORWARDED_FOR);
         }
         if (isUnknownIp(ip)) {
             // An alternative form of the header (X-ProxyUser-Ip) is used by Google clients talking to Google servers.
-            ip = request.getHeader(HttpRequestConstant.HTTP_HEADER_HTTP_PROXYUSER_IP);
+            ip = request.getHeader(HttpHeaderConstant.HTTP_HEADER_HTTP_PROXYUSER_IP);
         }
         if (isUnknownIp(ip)) {
             ip = request.getRemoteAddr();
@@ -74,7 +74,7 @@ public class HttpUtil {
     private static boolean isUnknownIp(String ip) {
         return StringUtils.isBlank(ip)
                 || "unknown".equalsIgnoreCase(ip)
-                || HttpRequestConstant.UNDEFINED_IP.equalsIgnoreCase(ip);
+                || HttpHeaderConstant.UNDEFINED_IP.equalsIgnoreCase(ip);
     }
 
     private static String extractClientIpByForwardedFor(String headerValue) {
