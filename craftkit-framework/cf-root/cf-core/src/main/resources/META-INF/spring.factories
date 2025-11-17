@@ -1,0 +1,6 @@
+# Application Context Initializers
+org.springframework.context.ApplicationContextInitializer=\
+com.springboot.craftkit.config.context.SampleFrameworkCoreApplicationContextInitializer\
+
+# Spring Boot BootstrapRegistryInitializers
+org.springframework.boot.BootstrapRegistryInitializer=\

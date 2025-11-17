@@ -1,0 +1,6 @@
+com.springboot.craftkit.framework.rest.config.RestAutoConfiguration
+com.springboot.craftkit.framework.rest.config.DomainSupportAutoConfiguration
+com.springboot.craftkit.framework.rest.config.RestCircuitBreakerAutoConfiguration
+com.springboot.craftkit.framework.rest.config.RestCircuitBreakerAopAutoConfiguration
+com.springboot.craftkit.framework.rest.config.SfRestClientAutoConfiguration
+com.springboot.craftkit.framework.rest.config.ErrorHandlingConfiguration

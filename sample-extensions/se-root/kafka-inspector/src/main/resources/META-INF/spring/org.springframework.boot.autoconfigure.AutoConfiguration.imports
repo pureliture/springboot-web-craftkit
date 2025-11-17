@@ -1,3 +1,0 @@
-com.teststrategy.multimodule.maven.config.EventuateInspectorConfig
-com.teststrategy.multimodule.maven.config.KafkaStreamInspectorConfig
-com.teststrategy.multimodule.maven.config.TopicInspectorConfig

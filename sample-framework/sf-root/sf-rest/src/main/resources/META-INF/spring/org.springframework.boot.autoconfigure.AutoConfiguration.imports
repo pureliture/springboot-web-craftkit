@@ -1,6 +1,0 @@
-com.teststrategy.multimodule.maven.sf.framework.rest.config.RestAutoConfiguration
-com.teststrategy.multimodule.maven.sf.framework.rest.config.DomainSupportAutoConfiguration
-com.teststrategy.multimodule.maven.sf.framework.rest.config.RestCircuitBreakerAutoConfiguration
-com.teststrategy.multimodule.maven.sf.framework.rest.config.RestCircuitBreakerAopAutoConfiguration
-com.teststrategy.multimodule.maven.sf.framework.rest.config.SfRestClientAutoConfiguration
-com.teststrategy.multimodule.maven.sf.framework.rest.config.ErrorHandlingConfiguration

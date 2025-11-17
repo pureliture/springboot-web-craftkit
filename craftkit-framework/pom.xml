@@ -1,13 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.springboot.craftkit</groupId>
-    <artifactId>springboot-web-craftkit</artifactId>
+    <parent>
+        <groupId>com.springboot.craftkit</groupId>
+        <artifactId>springboot-web-craftkit</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>craftkit-framework</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>craftkit-extension</module>
-        <module>craftkit-framework</module>
+        <module>cf-dependencies</module>
+        <module>cf-root</module>
+        <module>cf-tests</module>
     </modules>
 
     <properties>

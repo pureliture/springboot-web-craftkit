@@ -1,0 +1,3 @@
+com.springboot.craftkit.config.EventuateInspectorConfig
+com.springboot.craftkit.config.KafkaStreamInspectorConfig
+com.springboot.craftkit.config.TopicInspectorConfig
