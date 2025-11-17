@@ -10,8 +10,8 @@ import org.springframework.cloud.netflix.hystrix.HystrixCircuitBreakerConfigurat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import sf.framework.hystrix.RequestScopeHystrixConcurrencyStrategy;
-import sf.framework.hystrix.shutdown.HystrixDownHelper;
+import com.springboot.craftkit.framework.hystrix.RequestScopeHystrixConcurrencyStrategy;
+import com.springboot.craftkit.framework.hystrix.shutdown.HystrixDownHelper;
 
 import java.util.function.UnaryOperator;
 
