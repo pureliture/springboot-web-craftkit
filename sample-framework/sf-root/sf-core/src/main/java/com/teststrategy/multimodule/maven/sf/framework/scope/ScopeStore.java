@@ -54,9 +54,9 @@ public class ScopeStore implements RequestScopeStore {
         setAndGetThreadLocal(attribute);
     }
 
-    @SneakyThrows
     private ScopeAttribute setAndGetThreadLocal(ScopeAttribute attribute) {
-        ScopeAttribute cloned = (ScopeAttribute) attribute.clone();
+        // 기존: (ScopeAttribute) attribute.clone();  -> S2975 위반
+        ScopeAttribute cloned = ScopeAttribute.of(attribute); // 복사 생성자 기반 복제
         attributeThreadLocal.set(cloned);
         return cloned;
     }
@@ -68,5 +68,4 @@ public class ScopeStore implements RequestScopeStore {
     private RequestScopeAttribute emptyAttribute() {
         return new ScopeAttribute();
     }
-
 }

@@ -1,7 +1,7 @@
 # Application Context Initializers
 org.springframework.context.ApplicationContextInitializer=\
 com.teststrategy.multimodule.maven.config.context.SampleFrameworkCoreApplicationContextInitializer,\
-com.teststrategy.multimodule.maven.config.env.SampleFrameworkRestEnvironmentApplicationContextInitializer\
+com.teststrategy.multimodule.maven.config.env.SampleFrameworkCorePropertyApplicationContextInitializer\
 
 # Spring Boot BootstrapRegistryInitializers
 org.springframework.boot.BootstrapRegistryInitializer=\

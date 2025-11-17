@@ -123,7 +123,7 @@ When configured, `sf-rest` auto-config exports beans:
 - `DomainApiProperties` (reads `domain-api.yml` and resolves `{@domain.api}` in URIs)
 
 
-## Automatic URI placeholder resolution (parity with wafful-rest)
+## Automatic URI placeholder resolution
 When domain configuration is provided, `sf-rest` will automatically resolve URI placeholders in `RestTemplate` calls:
 - `{@domain}` → resolved using `domain.yml` from `sample-framework.rest.domain.config`
 - `{@domain.api}` → resolved using `domain-api.yml` from `sample-framework.rest.domain.api.config`
@@ -226,7 +226,7 @@ Notes:
 
 
 ## HTTP client–based retry (HttpClient5)
-This module supports an opt-in retry mechanism implemented at the HTTP client layer using Apache HttpClient 5. It does not use Spring Retry, matching the requested wafful-style approach.
+This module supports an opt-in retry mechanism implemented at the HTTP client layer using Apache HttpClient 5. It does not use Spring Retry.
 
 - Disabled by default for backward compatibility.
 - Retries occur only for selected HTTP methods (idempotent by default) and for network I/O errors and/or configured HTTP statuses (5xx by default).

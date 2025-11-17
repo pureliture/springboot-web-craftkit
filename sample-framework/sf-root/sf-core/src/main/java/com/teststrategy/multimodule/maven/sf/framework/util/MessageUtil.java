@@ -1,6 +1,7 @@
 package com.teststrategy.multimodule.maven.sf.framework.util;
 
 import com.teststrategy.multimodule.maven.sf.framework.application.ApplicationContextUtil;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.NoSuchMessageException;
@@ -10,32 +11,34 @@ import org.springframework.context.support.MessageSourceAccessor;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.UnaryOperator;
 
 
 @Slf4j
 public abstract class MessageUtil {
 
-    private static Map<String, UnaryOperator<Throwable>> otherCausedExtractorList = new ConcurrentHashMap<>();
+    private static final Map<String, UnaryOperator<Throwable>> otherCausedExtractorList = new ConcurrentHashMap<>();
     private static boolean useAbbreviatedName = false;
+    private static final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    protected MessageUtil(String name, UnaryOperator<Throwable> otherCausedExtractor) {
-        if(otherCausedExtractor != null) {
-            otherCausedExtractorList.put(name,otherCausedExtractor);
+    public static void registerOtherCausedExtractor(String name, UnaryOperator<Throwable> otherCausedExtractor) {
+        if (name != null && otherCausedExtractor != null) {
+            otherCausedExtractorList.put(name, otherCausedExtractor);
         }
     }
 
-    protected MessageUtil(String name, UnaryOperator<Throwable> otherCausedExtractor, boolean useAbbreviatedName) {
-        if(otherCausedExtractor != null) {
-            otherCausedExtractorList.put(name,otherCausedExtractor);
+    /**
+     * 약어 패키지명 사용 여부 초기화(애플리케이션 부팅 시 1회만 허용)
+     */
+    public static void initUseAbbreviatedName(boolean use) {
+        if (initialized.compareAndSet(false, true)) {
+            useAbbreviatedName = use;
+        } else {
+            // 재설정 시도를 차단(선호 정책에 따라 예외를 던지거나 로그만 남길 수 있음)
+            log.debug("initUseAbbreviatedName() already initialized. Ignoring change.");
         }
-        MessageUtil.useAbbreviatedName = useAbbreviatedName;
     }
-
-    protected MessageUtil(boolean useAbbreviatedName) {
-        MessageUtil.useAbbreviatedName = useAbbreviatedName;
-    }
-
 
     public static MessageSourceAccessor getMessageSourceAccessor() {
         try {

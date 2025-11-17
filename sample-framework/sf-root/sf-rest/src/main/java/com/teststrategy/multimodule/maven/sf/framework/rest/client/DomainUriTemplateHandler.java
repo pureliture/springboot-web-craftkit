@@ -1,8 +1,8 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.client;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.chain.UriTemplateHandlerInterceptorChain;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainApiProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;

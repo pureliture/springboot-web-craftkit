@@ -1,9 +1,9 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.config.DomainSupportAutoConfiguration;
 import com.teststrategy.multimodule.maven.sf.framework.rest.config.RestAutoConfiguration;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainApiProperties;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;

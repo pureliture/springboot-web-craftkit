@@ -15,9 +15,10 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * - 값이 디렉토리인 경우, 해당 디렉토리 내에 domain.yml 파일을 시도합니다.
  * - 값이 파일 경로나 리소스 경로인 경우, 이에 따라 해석합니다.
  */
-public class SampleFrameworkRestEnvironmentApplicationContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
+public class SampleFrameworkCorePropertyApplicationContextInitializer
+        implements ApplicationContextInitializer<ConfigurableApplicationContext>, Ordered {
 
-    private static final Logger log = LoggerFactory.getLogger(SampleFrameworkRestEnvironmentApplicationContextInitializer.class);
+    private static final Logger log = LoggerFactory.getLogger(SampleFrameworkCorePropertyApplicationContextInitializer.class);
 
     /**
      * 높은 우선순위로 실행되며, Spring Cloud 부트스트랩 구성이 로드된 이후이면서 대부분의 사용자 구성보다 먼저 실행됩니다.

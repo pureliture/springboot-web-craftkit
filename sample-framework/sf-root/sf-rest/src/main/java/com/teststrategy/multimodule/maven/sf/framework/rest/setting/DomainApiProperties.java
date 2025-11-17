@@ -1,8 +1,9 @@
-package com.teststrategy.multimodule.maven.sf.framework.application.setting;
+package com.teststrategy.multimodule.maven.sf.framework.rest.setting;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.exception.SfDomainConfigException;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.loader.DomainApiLoader;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.loader.SpringBindableDomainApiLoader;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.loader.YamlObjectMapperDomainApiLoader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,10 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.util.UriTemplate;
 
-import java.io.InputStream;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
@@ -26,23 +26,27 @@ import java.util.Optional;
  * demo:
  *   get:
  *     url: /get?id={id}&name={name}
- * apim:
- *   resource:
- *     url: "{@apim-pv}/resource?statusCode={statusCode}"
  */
 @Slf4j
 public class DomainApiProperties implements InitializingBean {
 
     public static final String BULK_REQUEST_METHOD = ":bulkProcess";
 
-    public static final String CONFIG_PATH = "sf-rest.domain.api.config";
+    public static final String CONFIG_PATH = "sf-rest.domain.api.config"; // primary key
+    public static final String LOADER_KEY = "sf-rest.domain.api.loader"; // simple|bind
     public static final String PLACEHOLDERS = "${" + CONFIG_PATH + ":}";
 
     @ToString.Exclude
     private final transient Environment environment;
 
+    @ToString.Exclude
+    private final transient ResourceLoader resourceLoader;
+
     @Getter
     private final String configPath;
+
+    /** Selected loader id for logging */
+    private final String loaderId;
 
     /**
      * domainName -> (apiName -> ApiProperties)
@@ -50,27 +54,60 @@ public class DomainApiProperties implements InitializingBean {
     LinkedHashMap<String, LinkedHashMap<String, ApiProperties>> domainApis = new LinkedHashMap<>();
 
     public DomainApiProperties(final Environment environment) {
-        this.environment = environment;
-        String resolved = environment != null ? environment.resolvePlaceholders(PLACEHOLDERS) : null;
-        this.configPath = StringUtils.defaultString(resolved);
+        this(environment, new org.springframework.core.io.DefaultResourceLoader());
+    }
 
-        if (StringUtils.isBlank(this.configPath)) {
-            log.debug("{} not configured; DomainApiProperties will be inactive.", CONFIG_PATH);
-            throw new IllegalStateException(CONFIG_PATH + " is not configured");
+    public DomainApiProperties(final Environment environment, final ResourceLoader resourceLoader) {
+        this.environment = environment;
+        this.resourceLoader = resourceLoader != null ? resourceLoader : new org.springframework.core.io.DefaultResourceLoader();
+
+        // choose loader
+        String loaderProp = environment != null ? environment.getProperty(LOADER_KEY, "simple") : "simple";
+        DomainApiLoader loader = ("bind".equalsIgnoreCase(loaderProp)) ? new SpringBindableDomainApiLoader() : new YamlObjectMapperDomainApiLoader();
+        this.loaderId = loader.id();
+
+        // resolve configPath with precedence: sf-rest key first
+        String sfResolved = environment != null ? environment.resolvePlaceholders("${" + CONFIG_PATH + ":}") : null;
+        if (!isUnset(sfResolved)) {
+            this.configPath = sfResolved;
+        } else {
+            String msg = "Configuration path not set. Please configure either '" + CONFIG_PATH + "'.";
+            log.warn(msg);
+            throw new SfDomainConfigException(msg);
         }
 
         try {
-            loadFromYaml(this.configPath);
+            LinkedHashMap<String, LinkedHashMap<String, ApiProperties>> loaded = loader.load(this.resourceLoader, this.configPath);
+            this.domainApis = loaded != null ? loaded : new LinkedHashMap<>();
             // backfill domain/api names into each ApiProperties
             if (domainApis != null) {
-                domainApis.forEach((domain, apis) -> apis.forEach((apiName, api) -> {
-                    api.setDomain(domain);
-                    api.setApi(apiName);
-                }));
+                domainApis.forEach((domain, apis) -> {
+                    if (apis != null) {
+                        apis.forEach((apiName, api) -> {
+                            if (api != null) {
+                                api.setDomain(domain);
+                                api.setApi(apiName);
+                            }
+                        });
+                    }
+                });
             }
+            int domainCount = this.domainApis.size();
+            int apiCount = this.domainApis.values().stream().mapToInt(m -> m != null ? m.size() : 0).sum();
+            log.info("DomainApiProperties initialized. loader={}, configPath={}, domains={}, apis={}", this.loaderId, this.configPath, domainCount, apiCount);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to load domain-api YAML from " + this.configPath + ": " + e.getMessage(), e);
+            String msg = "Failed to load domain-api from '" + this.configPath + "' using loader '" + this.loaderId + "': " + e.getMessage();
+            log.warn(msg, e);
+            throw new SfDomainConfigException(msg, e);
         }
+    }
+
+    /**
+     * @deprecated Use getOptionalApi(uri) instead.
+     */
+    @Deprecated
+    public Optional<ApiProperties> getApi(final String uriTemplateString) {
+        return getOptionalApi(uriTemplateString);
     }
 
     public Optional<ApiProperties> getOptionalApi(final String uriTemplateString) {
@@ -125,36 +162,8 @@ public class DomainApiProperties implements InitializingBean {
         return url;
     }
 
-    private void loadFromYaml(String path) throws Exception {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        try (InputStream is = ResourceResolver.openStream(path)) {
-            if (is == null) {
-                log.warn("domain-api YAML resource not found at {}", path);
-                return;
-            }
-            JsonNode root = mapper.readTree(is);
-            if (root == null || !root.isObject()) return;
-            Iterator<String> domains = root.fieldNames();
-            while (domains.hasNext()) {
-                String domain = domains.next();
-                JsonNode apisNode = root.get(domain);
-                if (apisNode == null || !apisNode.isObject()) continue;
-
-                LinkedHashMap<String, ApiProperties> apiMap = new LinkedHashMap<>();
-                Iterator<String> apis = apisNode.fieldNames();
-                while (apis.hasNext()) {
-                    String apiName = apis.next();
-                    JsonNode apiNode = apisNode.get(apiName);
-                    if (apiNode == null || !apiNode.isObject()) continue;
-                    JsonNode url = apiNode.get("url");
-                    if (url == null || url.isNull()) continue;
-                    ApiProperties ap = new ApiProperties();
-                    ap.setUrl(url.asText());
-                    apiMap.put(apiName, ap);
-                }
-                this.domainApis.put(domain, apiMap);
-            }
-        }
+    private static boolean isUnset(String value) {
+        return StringUtils.isBlank(value) || "null".equalsIgnoreCase(value.trim());
     }
 
     public static class ApiProperties {
@@ -178,6 +187,14 @@ public class DomainApiProperties implements InitializingBean {
         /** Cached parsed URL */
         @ToString.Exclude
         private String parsedUrl;
+
+        /** Enable RestClient error handler (200-with-error detection) for this API. */
+        @Getter @Setter
+        private Boolean enabledRestClientErrorHandler;
+
+        /** Per-API circuit breaker property holder (stored only). */
+        @Getter @Setter
+        private SfRestCircuitBreakerProperties circuitBreaker = new SfRestCircuitBreakerProperties();
 
         public void setUrl(final String url) {
             this.url = url;
@@ -217,6 +234,22 @@ public class DomainApiProperties implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // Reserved for future adjustments (e.g., circuit breaker config alignment)
+        if (this.domainApis == null || this.domainApis.isEmpty()) {
+            log.warn("DomainApiProperties loaded but contains no entries. configPath={} loader={}", this.configPath, this.loaderId);
+        }
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("DomainApiProperties (")
+                .append(this.configPath).append(") [");
+        if (this.domainApis != null) {
+            this.domainApis.forEach((d, group) -> {
+                if (group != null) {
+                    group.forEach((a, api) -> sb.append('\n').append('\t').append(d).append('.').append(a).append(" = ").append(api));
+                }
+            });
+        }
+        return sb.append('\n').append(']').toString();
     }
 }

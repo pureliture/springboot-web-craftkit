@@ -1,10 +1,10 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.config;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.setting.DomainApiProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.RestTemplateCircuitBreakerAspect;
 import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.SfResilience4jCircuitBreakerFactoryDelegator;
 import com.teststrategy.multimodule.maven.sf.framework.rest.circuitbreaker.SfRestCircuitBreakerRegistryRefresher;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CircuitBreakerInstanceNamer;
+import com.teststrategy.multimodule.maven.sf.framework.rest.setting.DomainApiProperties;
 import com.teststrategy.multimodule.maven.sf.framework.rest.setting.SfRestCircuitBreakerProperties;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.timelimiter.TimeLimiterRegistry;
@@ -41,6 +41,12 @@ public class RestCircuitBreakerAopAutoConfiguration {
             TimeLimiterRegistry timeLimiterRegistry,
             org.springframework.beans.factory.ObjectProvider<Resilience4JConfigurationProperties> cloudProps) {
         return new SfResilience4jCircuitBreakerFactoryDelegator(registry, timeLimiterRegistry, cloudProps.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CircuitBreakerInstanceNamer circuitBreakerInstanceNamer(SfRestCircuitBreakerProperties properties) {
+        return new CircuitBreakerInstanceNamer(properties);
     }
 
     @Bean

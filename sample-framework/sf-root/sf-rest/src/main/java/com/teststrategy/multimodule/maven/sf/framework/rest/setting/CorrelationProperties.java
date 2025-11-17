@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest.setting;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpRequestConstant;
+import com.teststrategy.multimodule.maven.sf.framework.application.constant.HeaderConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = CorrelationProperties.PREFIX)
@@ -11,7 +11,7 @@ public class CorrelationProperties {
     private boolean enabled = true;
 
     /** Header name to use. Defaults to a neutral transaction ID header. */
-    private String headerName = HttpRequestConstant.HTTP_HEADER_TRANSACTION_ID;
+    private String headerName = HeaderConstant.HEADER_GLOBAL_TRANSACTION_ID;
 
     public boolean isEnabled() {
         return enabled;

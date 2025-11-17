@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.rest;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpRequestConstant;
+import com.teststrategy.multimodule.maven.sf.framework.application.constant.HeaderConstant;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.CorrelationIdClientHttpRequestInterceptor;
 import com.teststrategy.multimodule.maven.sf.framework.rest.client.ForwardHeadersClientHttpRequestInterceptor;
 import com.teststrategy.multimodule.maven.sf.framework.rest.setting.CorrelationProperties;
@@ -61,7 +61,7 @@ public class RestInterceptorsTest {
         StubHttpRequest outbound = new StubHttpRequest(URI.create("https://example.org"), HttpMethod.GET);
         interceptor.intercept(outbound, new byte[0], new NoopExecution());
 
-        String headerName = HttpRequestConstant.HTTP_HEADER_TRANSACTION_ID;
+        String headerName = HeaderConstant.HEADER_GLOBAL_TRANSACTION_ID;
         assertThat(outbound.getHeaders().getFirst(headerName)).isNotBlank();
     }
 

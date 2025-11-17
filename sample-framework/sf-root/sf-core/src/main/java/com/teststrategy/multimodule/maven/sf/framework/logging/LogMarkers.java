@@ -10,9 +10,6 @@ public class LogMarkers {
         throw new IllegalStateException("LogMarker Constants class");
     }
 
-    /**
-     * Root LogMarker
-     */
     public static final Marker ROOT = MarkerFactory.getMarker("ROOT");
 
 

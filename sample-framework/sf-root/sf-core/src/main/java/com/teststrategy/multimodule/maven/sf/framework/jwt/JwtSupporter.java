@@ -1,6 +1,6 @@
 package com.teststrategy.multimodule.maven.sf.framework.jwt;
 
-import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpRequestConstant;
+import com.teststrategy.multimodule.maven.sf.framework.application.constant.HttpHeaderConstant;
 import com.teststrategy.multimodule.maven.sf.framework.util.HttpUtil;
 import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +13,7 @@ public class JwtSupporter {
      *  sample-framework.tokens.[token].cookie-path 로 부터 "BFF-Context-Path" 또는 "{BFF-Context-Path}"를 추출하는 패턴변수
      */
     static final Pattern bffContestHeaderPattern =
-            Pattern.compile("[{]?" + HttpRequestConstant.HTTP_HEADER_BFF_CONTEXT_PATH + "[}]?",
+            Pattern.compile("[{]?" + HttpHeaderConstant.HTTP_HEADER_BFF_CONTEXT_PATH + "[}]?",
                     Pattern.CASE_INSENSITIVE);
 
     private JwtSupporter() {
@@ -25,8 +25,8 @@ public class JwtSupporter {
      */
     public static String expendBffContextRootPath(String property) {
         try {
-            if (StringUtils.containsIgnoreCase(property, HttpRequestConstant.HTTP_HEADER_BFF_CONTEXT_PATH)) {
-                String headerValue = HttpUtil.getCurrentRequestHeaderString(HttpRequestConstant.HTTP_HEADER_BFF_CONTEXT_PATH);
+            if (StringUtils.containsIgnoreCase(property, HttpHeaderConstant.HTTP_HEADER_BFF_CONTEXT_PATH)) {
+                String headerValue = HttpUtil.getCurrentRequestHeaderString(HttpHeaderConstant.HTTP_HEADER_BFF_CONTEXT_PATH);
                 if (headerValue.isEmpty()) {
                     headerValue = "bff";
                 }

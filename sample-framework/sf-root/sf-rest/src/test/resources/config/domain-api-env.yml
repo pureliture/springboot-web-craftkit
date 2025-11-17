@@ -1,0 +1,3 @@
+env:
+  test:
+    url: "/v-${test.value}"
