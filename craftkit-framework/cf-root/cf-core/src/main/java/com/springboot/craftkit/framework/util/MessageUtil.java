@@ -7,6 +7,8 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.MessageSourceAccessor;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,5 +118,21 @@ public abstract class MessageUtil {
         }
 
         return message;
+    }
+
+    /**
+     * Converts a Throwable's stack trace to a String.
+     *
+     * @param throwable the Throwable to get the stack trace from
+     * @return the stack trace as a String
+     */
+    public static String getStackTraceString(Throwable throwable) {
+        if (throwable == null) {
+            return "";
+        }
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString();
     }
 }
