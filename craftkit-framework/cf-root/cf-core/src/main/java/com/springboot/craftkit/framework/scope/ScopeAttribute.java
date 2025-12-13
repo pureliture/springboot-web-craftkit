@@ -72,6 +72,9 @@ public class ScopeAttribute implements RequestScopeAttribute {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> forwardedService = new ArrayList<>();
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<String> forwardedFor = new ArrayList<>();
+
     public ScopeAttribute() {
     }
 
@@ -313,6 +316,22 @@ public class ScopeAttribute implements RequestScopeAttribute {
     @JsonIgnore
     public void addForwardedService(String service) {
         this.forwardedService.add(service);
+    }
+
+    public List<String> getForwardedFor() {
+        return forwardedFor;
+    }
+
+    public void setForwardedFor(List<String> forwardedFor) {
+        this.forwardedFor.clear();
+        if (!CollectionUtils.isEmpty(forwardedFor)) {
+            this.forwardedFor.addAll(forwardedFor);
+        }
+    }
+
+    @JsonIgnore
+    public void addForwardedFor(String ip) {
+        this.forwardedFor.add(ip);
     }
 
     public final Level getLogLevel() {

@@ -1,0 +1,4 @@
+com.springboot.craftkit.config.web.WebConfig
+com.springboot.craftkit.config.web.WebMvcConfig
+com.springboot.craftkit.config.web.CustomErrorConfig
+com.springboot.craftkit.config.web.ControllerAdvisorConfig

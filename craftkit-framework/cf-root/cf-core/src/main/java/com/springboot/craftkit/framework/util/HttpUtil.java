@@ -9,6 +9,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Slf4j
@@ -97,5 +100,34 @@ public class HttpUtil {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Check if the path matches common endpoint patterns (swagger, actuator, webjars, etc.)
+     * <pre>
+     * "^(/\\w+)?/actuator/"
+     * "^(/\\w+)?/webjars/"
+     * "^(/\\w+)?/swagger"
+     * "^(/\\w+)?/v2/api-docs"
+     * </pre>
+     *
+     * @param path the request path
+     * @return true if the path matches any common endpoint pattern
+     */
+    public static boolean isCommonEndpointPatternContains(String path) {
+        return isPatternContains(path, HttpHeaderConstant.COMMON_ENDPOINT_PATTERNS_LIST);
+    }
+
+    /**
+     * Check if the given string matches any pattern in the pattern list.
+     *
+     * @param path the string to check
+     * @param patternList the list of patterns to match against
+     * @return true if the path matches any pattern
+     */
+    public static boolean isPatternContains(String path, List<Pattern> patternList) {
+        return patternList.stream()
+                .map(pattern -> pattern.matcher(path))
+                .anyMatch(Matcher::find);
     }
 }
